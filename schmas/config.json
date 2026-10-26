@@ -1,0 +1,69 @@
+{
+  "$schmas": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": ["core", "configuration", "authorized_dirs"],
+  "properties": {
+    "core": {
+      "type": "object",
+      "required": ["name", "path"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the vault"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/",
+          "description": "path location of the vault"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": ["date_format", "time_format"],
+      "properties": {
+        "date_format": {
+          "type": "string",
+          "enum": [
+            "yyyy-MM-dd",
+            "dd/MM/yyyy",
+            "MM/dd/yyyy",
+            "dd-MM-yyyy",
+            "dd/MM/yy",
+            "d MMM yyyy",
+            "MMMM d, yyyy",
+            "dd MMMM yyyy",
+            "EEE, dd MMM yyyy"
+          ]
+        },
+        "time_format": {
+          "type": "string",
+          "enum": ["HH:mm", "HH:mm:ss", "hh:mm a", "hh:mm:ss a", "H:m", "h:m a"]
+        }
+      },
+      "authorized_dirs": {
+        "type": "array",
+        "items": {
+          "type": "objects",
+          "required": ["path", "permissions", "enable"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^/",
+              "example": "/home/user/workdir"
+            },
+            "permissions": {
+              "type": "string",
+              "pattern": "^0?[0-7]{3}$",
+              "example": "0777"
+            },
+            "enable": {
+              "type": "boolean",
+              "default": "true"
+            }
+          }
+        }
+      }
+    }
+  }
+}

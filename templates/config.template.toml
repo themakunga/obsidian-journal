@@ -1,0 +1,12 @@
+[core]
+name = "{{journal_name}}"
+path = "{{journal_path}}"
+
+[configurations]
+date_format = "{{date_format}}"
+time_format = "{{time_format}}"
+
+[[authorized_dir]]
+path = "{{authorized_dir[].path}}"
+permissions = "{{authorized_dir[].permission}}"
+enable = "{{authorized_dir[].enable}}"

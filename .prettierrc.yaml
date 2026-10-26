@@ -1,1 +1,17 @@
-proseWrap: preserve
+overrides:
+  - files: "*.lua"
+    options:
+      plugins: ["@prettier/plugin-lua"]
+  - files: "*.sh"
+    options:
+      plugins: [prettier-plugin-sh]
+  - files: "*.toml"
+    options:
+      plugins: [prettier-plugin-toml]
+  - files: "*.json"
+    options:
+      tabWidth: 2
+  - files: "*.md"
+    options:
+      proseWrap: preserve
+      embeddedLanguageFormatting: "off"

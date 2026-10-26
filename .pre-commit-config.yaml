@@ -1,17 +1,38 @@
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+exclude: ^templates/
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: detect-private-key
       - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
       - id: check-merge-conflict
 
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:
       - id: prettier
-        files: \.(json|md|ya?ml)$
-        entry: prettier --check --ignore-unknown
+        files: \.(json|md|ya?ml|lua|sh|toml)$
+        types_or: [json, markdown, yaml, lua, shell, toml]
+        additional_dependencies:
+          - prettier@3.9.6
+          - "@prettier/plugin-lua@0.0.3"
+          - prettier-plugin-sh@0.20.2
+          - prettier-plugin-toml@3.0.2
+        # Resolve plugins from the isolated hook environment.
+        entry: >-
+          bash -c 'files=(); for file; do files+=("$PWD/$file"); done;
+          cd "$(npm root -g)" || exit;
+          exec prettier --write "${files[@]}"' --
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.23.3
@@ -30,5 +51,8 @@ repos:
     rev: v9.27.0
     hooks:
       - id: commitlint
+        additional_dependencies: ["@commitlint/config-conventional@21.2.2"]
+        # Make the isolated preset available to the repository configuration.
+        entry: bash -c 'export NODE_PATH="$(npm root -g)"; exec commitlint --edit "$@"' --
         stages: [commit-msg]
         pass_filenames: true

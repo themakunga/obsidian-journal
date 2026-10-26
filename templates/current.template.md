@@ -1,0 +1,43 @@
+---
+id: journal-{{date_label}}
+aliases:
+  - "journal-{{date_label}}"
+  - "daily-{{date_label}}"
+tags:
+  - journal
+  {{#each tags}}
+    - {{name}}
+  {{/each}}
+created_at: "{{date}}T00:00:00"
+month: "[[{{journal_dir}}-monthly/{{month}}|{{month}}]]"
+year: "{{year}}"
+---
+
+# Journal - {{date_label}}
+| Ref | Location |
+| --- | --- |
+| **Previous day** | [[{{journal_base}}/{{previous_day}}\|{{previous_day}}]] |
+| **Previous Week** | [[{{journal_dir}}/{{previous_week}}/summary\|{{previous_week}}]] |
+| **Previous Month** | [[{{journal_dir}}/monthy/{{previous_month}}\|{{previous_month}}]] |
+
+
+## Details
+
+{{#each entry}}
+
+### {{time}} - {{hash}} - {{agent}} - {{host}}
+
+**Work:** {{work}}
+
+**CWD:** `{{cwd}}`
+
+**Files:**
+{{files}}
+
+**Verification:**
+{{verification}}
+
+**Pending:**
+{{pending}}
+
+{{/each}}
