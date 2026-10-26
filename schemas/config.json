@@ -1,5 +1,5 @@
 {
-  "$schmas": "http://json-schema.org/draft-04/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "required": ["core", "configuration", "authorized_dirs"],
   "properties": {
@@ -40,7 +40,7 @@
           "type": "string",
           "enum": ["HH:mm", "HH:mm:ss", "hh:mm a", "hh:mm:ss a", "H:m", "h:m a"]
         },
-        "agrents": {
+        "agents": {
           "type": "array",
           "uniqueItems": true,
           "minItems": 1,
