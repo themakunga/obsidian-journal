@@ -113,3 +113,13 @@ feat(journal): add daily entries
 fix: preserve existing notes
 docs: explain configuration
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation, and pull request
+requirements. Participation is covered by the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+Licensed under the [MIT License](LICENSE).

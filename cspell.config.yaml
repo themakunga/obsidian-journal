@@ -29,6 +29,7 @@ ignorePaths:
 
 words:
   - commitlint
+  - frontmatter
   - luacheck
   - luarocks
   - markdownlint
@@ -36,3 +37,4 @@ words:
   - prettierd
   - rollups
   - TheMakunga
+  - Villarroel
