@@ -1,0 +1,36 @@
+---
+id: "journal-monthly-{{month}}"
+aliases:
+  - "journal-month-{{month}}"
+  - "summary-month-{{month}}"
+tags:
+  - "journal"
+  {{#each tags}}
+   - "{{name}}"
+  {{/each}}
+created_at: "{{month_start}}T00:00:00"
+updated_at: {{updated_at}}
+year: {{year}}
+enable_edit: {{enable_edit}}
+---
+
+# Journal - Monthly {{month_label}} {{year}}
+
+| Ref            | Location                                                   |
+| -------------- | ---------------------------------------------------------- |
+| Previous Month | [[{{journal_dir}}/monthly/{{prev_month}}\|{{prev_month}}]] |
+
+## Summary {{ month_start}} - {{month_end}}
+
+{{summary}}
+
+## Weeks
+
+{{#each weeks}}
+### {{week}}
+
+{{description}}
+
+[[{{journal_dir}}/{{week}}/summary\|{{week}}]]
+
+{{/each}}

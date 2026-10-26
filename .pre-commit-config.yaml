@@ -1,6 +1,5 @@
 default_install_hook_types: [pre-commit, commit-msg]
 default_stages: [pre-commit]
-exclude: ^templates/
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -21,8 +20,8 @@ repos:
     rev: v3.9.6
     hooks:
       - id: prettier
-        files: \.(json|md|ya?ml|lua|sh|toml)$
-        types_or: [json, markdown, yaml, lua, shell, toml]
+        files: \.(json|md|ya?ml|lua|sh|toml|hbs)$
+        types_or: [json, markdown, yaml, lua, shell, toml, handlebars]
         additional_dependencies:
           - prettier@3.9.6
           - "@prettier/plugin-lua@0.0.3"
@@ -30,9 +29,10 @@ repos:
           - prettier-plugin-toml@3.0.2
         # Resolve plugins from the isolated hook environment.
         entry: >-
-          bash -c 'files=(); for file; do files+=("$PWD/$file"); done;
+          bash -c 'ignore_path="$PWD/.prettierignore";
+          files=(); for file; do files+=("$PWD/$file"); done;
           cd "$(npm root -g)" || exit;
-          exec prettier --write "${files[@]}"' --
+          exec prettier --write --ignore-path "$ignore_path" "${files[@]}"' --
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.23.3
@@ -41,6 +41,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: cspell
+        name: cspell
+        entry: cspell lint --config cspell.config.yaml --no-progress
+        language: node
+        additional_dependencies: [cspell@8.19.4]
+        types: [text]
       - id: luacheck
         name: luacheck
         entry: luacheck --

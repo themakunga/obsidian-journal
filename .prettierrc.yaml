@@ -1,4 +1,9 @@
 overrides:
+  - files: "*.hbs"
+    options:
+      parser: glimmer
+      tabWidth: 2
+      useTabs: false
   - files: "*.lua"
     options:
       plugins: ["@prettier/plugin-lua"]
@@ -13,5 +18,8 @@ overrides:
       tabWidth: 2
   - files: "*.md"
     options:
-      proseWrap: preserve
+      printWidth: 80
+      tabWidth: 2
+      useTabs: false
+      proseWrap: always
       embeddedLanguageFormatting: "off"

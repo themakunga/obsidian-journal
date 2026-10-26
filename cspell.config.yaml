@@ -1,0 +1,38 @@
+version: "0.2"
+language: en
+useGitignore: true
+
+dictionaries:
+  - en_US
+  - companies
+  - softwareTerms
+  - misc
+  - filetypes
+  - npm
+  - typescript
+  - node
+  - python
+  - bash
+  - lua
+  - rust
+  - go
+  - html
+  - css
+  - cpp
+  - csharp
+  - php
+  - powershell
+
+ignorePaths:
+  - .git/**
+  - templates/**
+
+words:
+  - commitlint
+  - luacheck
+  - luarocks
+  - markdownlint
+  - Neovim
+  - prettierd
+  - rollups
+  - TheMakunga

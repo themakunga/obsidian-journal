@@ -39,6 +39,14 @@
         "time_format": {
           "type": "string",
           "enum": ["HH:mm", "HH:mm:ss", "hh:mm a", "hh:mm:ss a", "H:m", "h:m a"]
+        },
+        "agrents": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "item": {
+            "type": "string"
+          }
         }
       },
       "authorized_dirs": {

@@ -1,24 +1,23 @@
 ---
-id: journal-history
+id: "journal-history"
 aliases:
-  - journal-history
-  - summary-history
+  - "journal-history"
+  - "summary-history"
 tags:
-  - journal
+  - "journal"
   {{#each tags}}
-   - {{name}}
+   - "{{name}}"
   {{/each}}
-created_at: {{journal_start}}T00:00:00
+created_at: "{{journal_start}}T00:00:00"
 updated_at: {{updated_at}}
 ---
 
 # Journal - Monthly {{month_label}} {{year}}
 
-| Ref | Location |
-| --- | --- |
+| Ref           | Location                                                         |
+| ------------- | ---------------------------------------------------------------- |
 | Initial Month | [[{{journal_dir}}/monthly/{{initial_month}}\|{{initial_month}}]] |
-| Last Month | [[{{journal_dir}}/monthly/{{last_month}}\|{{last_month}}]]  |
-
+| Last Month    | [[{{journal_dir}}/monthly/{{last_month}}\|{{last_month}}]]       |
 
 ## Summary {{ start_date}} - {{updated_date}}
 

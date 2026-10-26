@@ -11,15 +11,29 @@ repo: obsidian-journal
 
 ## Description
 
-this si a rollup to silently register agent sessons into an obsidian vault
+this is a rollup to silently register agent sessions into an obsidian vault
 
 ---
 
 ## Configuration
 
+on install this plugin on your code agent,
+
 ## Installation
 
 ## Directory Layout
+
+```plain
+[vault]/                ← vault absolute path
+  journal-current.md    ← today's active file (only one at root)
+  journal/              ← journal base directory
+    history.md          ← historic summary
+    YYYY-Www/           ← weekly directory
+      YYYY-MM-DD.md     ← previous archived daily
+      summary.md        ← weekly summary
+    monthly/            ← monthly directory
+      YYYY-MM.md        ← monthly summary
+```
 
 ## Steps
 
@@ -35,7 +49,7 @@ this si a rollup to silently register agent sessons into an obsidian vault
 
 ### 6 - Commit and push Entry
 
-## Guardraild
+## Guardrails
 
 ## Permissions
 

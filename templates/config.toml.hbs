@@ -1,0 +1,22 @@
+#:schema .//schemas/config.json
+
+[core]
+name = "{{core.name}}"
+path = "{{core.path}}"
+
+[configuration]
+date_format = "{{configuration.date_format}}"
+time_format = "{{configuration.time_format}}"
+agents = [
+{{#each configuration.agents}}
+  "{{this}}"{{#unless @last}},{{/unless}}
+{{/each}}
+]
+
+{{#each authorized_dirs}}
+[[authorized_dirs]]
+enable = {{enable}}
+path = "{{path}}"
+permissions = "{{permissions}}"
+
+{{/each}}
