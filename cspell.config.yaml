@@ -17,8 +17,7 @@ ignorePaths:
 
 words:
   - commitlint
-  - firsthost
-  - gpgsign
+  - frontmatter
   - luacheck
   - luajit
   - luarocks
@@ -29,7 +28,6 @@ words:
   - rollups
   - secondhost
   - TheMakunga
+  - Villarroel
   - Taplo
   - taplo
-  - testhost
-  - wday
