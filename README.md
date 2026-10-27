@@ -4,26 +4,32 @@ An agent skill for recording work sessions in an Obsidian vault, with templates
 for daily entries and weekly, monthly, and historical summaries.
 
 The project is under development. This repository currently provides the skill
-outline, journal templates, a configuration template, a draft configuration
-schema, and development tooling. Automated rendering, rollups, and Git
-synchronization are not implemented here yet.
+outline, journal templates, a configuration installer, a journal workflow, a
+configuration schema, and development tooling.
 
 ## Repository layout
 
-| Path                        | Purpose                                                                  |
-| --------------------------- | ------------------------------------------------------------------------ |
-| `SKILL.md`                  | Agent skill entry point and planned workflow                             |
-| `templates/current.md.hbs`  | Current journal entries                                                  |
-| `templates/daily.md.hbs`    | Daily summary and session details                                        |
-| `templates/weekly.md.hbs`   | Weekly summary and daily links                                           |
-| `templates/monthly.md.hbs`  | Monthly summary                                                          |
-| `templates/historic.md.hbs` | Historical summary and monthly links                                     |
-| `templates/config.toml.hbs` | Vault location, date/time formats, and authorized directory placeholders |
-| `schemas/config.json`       | Draft configuration schema                                               |
+| Path                        | Purpose                                                                                   |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| `SKILL.md`                  | Agent skill entry point and planned workflow                                              |
+| `templates/current.md.hbs`  | Current journal entries                                                                   |
+| `templates/daily.md.hbs`    | Daily summary and session details                                                         |
+| `templates/weekly.md.hbs`   | Weekly summary and daily links                                                            |
+| `templates/monthly.md.hbs`  | Monthly summary                                                                           |
+| `templates/historic.md.hbs` | Historical summary and monthly links                                                      |
+| `templates/config.toml.hbs` | Vault location, date/time formats, and authorized directory placeholders                  |
+| `schemas/config.json`       | Configuration schema                                                                      |
+| `scripts/install.lua`       | Interactive vault configuration installer                                                 |
+| `scripts/sync.lua`          | Pull and roll the current day into the archive                                            |
+| `scripts/weekly.lua`        | Create and link completed weekly summaries                                                |
+| `scripts/monthly.lua`       | Create and link completed monthly summaries                                               |
+| `scripts/history.lua`       | Update the historical month index                                                         |
+| `scripts/entry.lua`         | Append a validated entry to today's journal                                               |
+| `scripts/publish.lua`       | Publish selected daily, weekly, monthly, history, or entry files with remote race retries |
 
 Templates use `{{...}}` placeholders and `{{#each ...}}` blocks. They are source
-templates rather than rendered vault notes. The configuration template and draft
-schema still need to be aligned before automated validation can be used.
+templates rather than rendered vault notes. Run the installer as described in
+`SKILL.md` to create or repair `.journal.config.toml` in a vault.
 
 ## Journal content
 
@@ -32,14 +38,19 @@ working directory, affected files, verification, and pending items. Summary
 templates provide links between daily, weekly, and monthly notes using Obsidian
 wiki-links.
 
-The planned workflow in `SKILL.md` covers synchronization, summary maintenance,
-entry creation, and committing and pushing entries. Its implementation is still
-pending.
+The workflow in `SKILL.md` uses Lua for file changes and Git operations. Agents
+write factual summary prose after the script creates the linked structure.
+
+Run the Lua checks with Lua, Taplo, and Git available on `PATH`:
+
+```sh
+lua tests/install.lua
+lua tests/journal.lua
+```
 
 ## Development
 
-Make `pre-commit` and `luacheck` available in your development environment, then
-run:
+Make `pre-commit` and Nix available in your development environment, then run:
 
 ```sh
 pre-commit install
@@ -55,8 +66,9 @@ formatting them as HTML corrupts their Markdown or TOML structure.
 File checks validate YAML, JSON, and TOML; detect merge markers,
 case-conflicting paths, and private keys; reject newly added files larger than
 500 KB; and fix final newlines and trailing whitespace while preserving Markdown
-line breaks. Markdownlint checks Markdown, and Luacheck checks Lua using the
-executable on `PATH`.
+line breaks. Markdownlint checks Markdown. The Luacheck hook invokes Nix, which
+downloads and caches Luacheck when needed; neither Luacheck nor LuaRocks needs
+to be installed on the host.
 
 ### Formatting
 

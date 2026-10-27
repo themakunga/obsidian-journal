@@ -8,21 +8,20 @@ tags:
   {{#each tags}}
     - "{{name}}"
   {{/each}}
-create_at: "{{week_start}}T00:00:00"
-updated_at: {{updared_at}}
+created_at: "{{week_start}}T00:00:00"
+updated_at: {{updated_at}}
 year: {{year}}
 enable_edit: {{enable_edit}}
 ---
 
-# Journal Summary Weekly -
-{{week}}
+# Journal Summary Weekly - {{week}}
 
-| Ref | Location | | --- | --- | | Previous Week | [[{{journal_dir}}/{{previous_week}}/summary\|{{previous_week}}]]
-| | Previous Month | [[{{journal_dir}}/{{previous_month}}\|{{previous_month}}]]
-| ## Summary
-{{week_start}}
--
-{{week_end}}
+| Ref | Location |
+| --- | --- |
+| Previous Week | [[{{journal_dir}}/{{previous_week}}/summary\|{{previous_week}}]] |
+| Previous Month | [[{{journal_dir}}/monthly/{{previous_month}}\|{{previous_month}}]] |
+
+## Summary {{week_start}} - {{week_end}}
 
 {{summary}}
 

@@ -9,12 +9,12 @@ tags:
     - "{{name}}"
   {{/each}}
 created_at: "{{date}}T00:00:00"
-month: "[[{{journal_dir}}-monthly/{{month}}|{{mouth}}]]"
+month: "[[{{journal_dir}}/monthly/{{month}}|{{month}}]]"
 year: {{year}}
 enable_edit: {{enable_edit}}
 ---
 
-# Journal - {{date-label}}
+# Journal - {{date_label}}
 
 | Ref            | Location                                                           |
 | -------------- | ------------------------------------------------------------------ |
@@ -29,15 +29,17 @@ enable_edit: {{enable_edit}}
 ## Details
 
 {{#each entries}}
-### {{time}} - {{hash}} - {{agent}} -- {{host}}
+### {{time}} - {{hash}} - {{agent}} - {{host}}
 
 **Work:**
-{{work}}
+
+- {{work}}
 
 **CWD:** `{{cwd}}`
 
 **Files:**
-{{files}}
+
+- {{files}}
 
 **Verification:**
 {{verification}}

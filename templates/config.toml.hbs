@@ -1,4 +1,6 @@
-#:schema .//schemas/config.json
+{{#unless authorized_dirs}}
+authorized_dirs = []
+{{/unless}}
 
 [core]
 name = "{{core.name}}"

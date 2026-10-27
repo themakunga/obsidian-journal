@@ -4,24 +4,12 @@ useGitignore: true
 
 dictionaries:
   - en_US
-  - companies
   - softwareTerms
   - misc
   - filetypes
-  - npm
-  - typescript
-  - node
   - python
   - bash
   - lua
-  - rust
-  - go
-  - html
-  - css
-  - cpp
-  - csharp
-  - php
-  - powershell
 
 ignorePaths:
   - .git/**
@@ -29,10 +17,19 @@ ignorePaths:
 
 words:
   - commitlint
+  - firsthost
+  - gpgsign
   - luacheck
+  - luajit
   - luarocks
   - markdownlint
   - Neovim
+  - nixpkgs
   - prettierd
   - rollups
+  - secondhost
   - TheMakunga
+  - Taplo
+  - taplo
+  - testhost
+  - wday

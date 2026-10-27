@@ -48,8 +48,8 @@ repos:
         additional_dependencies: [cspell@8.19.4]
         types: [text]
       - id: luacheck
-        name: luacheck
-        entry: luacheck --
+        name: Luacheck
+        entry: nix run nixpkgs#luajitPackages.luacheck --
         language: system
         types: [lua]
 
