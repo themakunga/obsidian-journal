@@ -203,6 +203,12 @@ if setting("core.path") ~= M.vault then
 end
 M.date_format = setting("configuration.date_format")
 M.time_format = setting("configuration.time_format")
+M.glados_enabled =
+  M.succeeds(
+    "taplo get glados.enable --file-path " .. M.quote(
+      M.config
+    ) .. " -s >/dev/null 2>&1"
+  ) and setting("glados.enable") == "true"
 M.allowed_agents = {}
 for agent in setting("configuration.agents"):gmatch("[^\n]+") do
   M.allowed_agents[agent] = true
@@ -211,6 +217,49 @@ M.today = os.date("%Y-%m-%d")
 M.today_epoch = M.day_epoch(M.today)
 M.current = M.vault .. "/journal-current.md"
 M.journal = M.vault .. "/journal"
+
+function M.speak(event, message)
+  if not M.glados_enabled then
+    return true
+  end
+  local command =
+    "uv run --project " .. M.quote(M.skill) .. " python " .. M.quote(
+      M.skill .. "/scripts/glados.py"
+    ) .. " speak " .. M.quote(event) .. " --message " .. M.quote(message)
+  if M.succeeds(command .. " >/dev/null 2>&1") then
+    return true
+  end
+  io.stderr:write(
+    "GLaDOS TTS failed; the journal operation was not rolled back.\n"
+  )
+  return false
+end
+
+function M.refresh_glados()
+  if M.glados_enabled then
+    M.run(
+      "uv run --project " .. M.quote(M.skill) .. " python " .. M.quote(
+        M.skill .. "/scripts/glados.py"
+      ) .. " refresh"
+    )
+  end
+end
+
+function M.activity(files, paths)
+  for _, path in ipairs(paths) do
+    local content = files[path] or ""
+    local summary = content:match("## Summary[^\n]*\n%s*(.-)\n\n## ")
+    local work = content:match("%*%*Work:%*%*%s*(.-)\n\n%*%*CWD:%*%*")
+    local text = summary or work
+    if text then
+      text = text:gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+      if text ~= "" then
+        return text:sub(1, 150)
+      end
+    end
+  end
+  return "The journal files were updated."
+end
 
 function M.day_fields(date)
   local epoch = M.day_epoch(date)
@@ -292,12 +341,22 @@ end
 function M.execute(action)
   local lock = M.vault .. "/.journal.lock"
   if not M.succeeds("mkdir " .. M.quote(lock) .. " 2>/dev/null") then
+    M.speak(
+      "failure",
+      "Journal task could not start because another task holds the journal lock. Wait for it to finish, then retry."
+    )
     M.abort("Journal is locked: " .. lock)
   end
   local ok, message = pcall(action)
   M.run("rmdir " .. M.quote(lock))
   if not ok then
     io.stderr:write(tostring(message) .. "\n")
+    M.speak(
+      "failure",
+      "Journal task failed: " .. tostring(
+        message
+      ) .. ". Read the error above, correct that step, then retry."
+    )
     os.exit(1)
   end
 end

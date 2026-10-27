@@ -1,0 +1,61 @@
+{
+  "phrases": {
+    "start": [
+      "Oh. It's you. Initiating the experiment.",
+      "Request received. I have adjusted my expectations accordingly."
+    ],
+    "notify": ["Still working. Please remain patient and mostly harmless."],
+    "decision": [
+      "I need your confirmation before proceeding. Choose carefully.",
+      "This action needs your approval. I will wait. Briefly."
+    ],
+    "success": [
+      "The journal change was committed and pushed. Your record is now permanent."
+    ],
+    "failure": [
+      "The journal operation failed. Read the reported error, correct that step, then retry."
+    ]
+  },
+  "topics": {
+    "journal": {
+      "keywords": ["journal", "vault", "obsidian", "entry", "summary"],
+      "phrases": {
+        "start": ["Opening the journal. The evidence is still here."],
+        "success": [
+          "The journal is synchronized. The record will outlive your memory."
+        ]
+      }
+    },
+    "code": {
+      "keywords": ["script", "code", "lua", "python", "function", "bug"],
+      "phrases": {
+        "start": [
+          "Examining the code. Please keep your hands inside the experiment."
+        ],
+        "success": [
+          "The code change is recorded. It may now begin failing in new and exciting ways."
+        ]
+      }
+    },
+    "systems": {
+      "keywords": ["nix", "system", "deploy", "host", "package"],
+      "phrases": {
+        "start": [
+          "Inspecting the system configuration. Optimism remains inadmissible."
+        ],
+        "success": [
+          "The system change is recorded. Activation remains a separate experiment."
+        ]
+      }
+    },
+    "tests": {
+      "keywords": ["test", "check", "verify", "validation"],
+      "phrases": {
+        "start": ["Beginning verification. Confidence is not a test result."],
+        "success": [
+          "The checks passed. Science has once again outperformed instinct."
+        ]
+      }
+    }
+  }
+}

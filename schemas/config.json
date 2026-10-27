@@ -49,30 +49,39 @@
             "type": "string"
           }
         }
-      },
-      "authorized_dirs": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "required": ["path", "permissions", "enable"],
-          "properties": {
-            "path": {
-              "type": "string",
-              "pattern": "^/",
-              "example": "/home/user/workdir"
-            },
-            "permissions": {
-              "type": "string",
-              "pattern": "^0?[0-7]{3}$",
-              "example": "0777"
-            },
-            "enable": {
-              "type": "boolean",
-              "default": true
-            }
+      }
+    },
+    "authorized_dirs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "permissions", "enable"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^/",
+            "example": "/home/user/workdir"
+          },
+          "permissions": {
+            "type": "string",
+            "pattern": "^0?[0-7]{3}$",
+            "example": "0777"
+          },
+          "enable": {
+            "type": "boolean",
+            "default": true
           }
         }
       }
+    },
+    "glados": {
+      "type": "object",
+      "required": ["enable"],
+      "properties": {
+        "enable": { "type": "boolean", "default": false },
+        "command": { "type": "string", "minLength": 1, "default": "glados-say" }
+      },
+      "additionalProperties": false
     }
   }
 }

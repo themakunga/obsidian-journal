@@ -23,6 +23,23 @@ local function merge_file(temp, path, base, ours, theirs)
       journal.abort("Current journal dates differ across hosts.")
     end
   end
+  if path == ".glados/phrases.yaml" then
+    local files = { temp .. "/ours", temp .. "/base", temp .. "/theirs" }
+    journal.write(files[1], ours)
+    journal.write(files[2], base or "[]\n")
+    journal.write(files[3], theirs)
+    local output = temp .. "/merged"
+    journal.run(
+      "uv run --project " .. journal.quote(
+        journal.skill
+      ) .. " python " .. journal.quote(
+        journal.skill .. "/scripts/glados.py"
+      ) .. " merge-phrases " .. journal.quote(files[2]) .. " " .. journal.quote(
+        files[1]
+      ) .. " " .. journal.quote(files[3]) .. " > " .. journal.quote(output)
+    )
+    return assert(journal.read(output))
+  end
   if not base then
     local prefix, left, right = {}, {}, {}
     for line in (ours .. "\n"):gmatch("(.-)\n") do
@@ -87,7 +104,7 @@ journal.execute(function()
     daily = function(path)
       return path == "journal-current.md" or path:match(
         "^journal/%d%d%d%d%-W%d%d/%d%d%d%d%-%d%d%-%d%d%.md$"
-      )
+      ) or (journal.glados_enabled and path == ".glados/phrases.yaml")
     end,
     weekly = function(path)
       return path:match("^journal/%d%d%d%d%-W%d%d/summary%.md$")
@@ -109,12 +126,13 @@ journal.execute(function()
     )
   end
   journal.git_root()
-  local paths, local_files, bases = {}, {}, {}
-  for index = 2, #arg do
-    local path = arg[index]
+  local paths, local_files, bases, seen = {}, {}, {}, {}
+  local function add_path(path)
     if not accepts(path) or path:find("%.%.") then
       journal.abort("Invalid " .. task .. " path: " .. path)
     end
+    if seen[path] then return end
+    seen[path] = true
     local content = journal.read(journal.vault .. "/" .. path)
     if not content then
       journal.abort("Invalid journal file: " .. path)
@@ -136,6 +154,15 @@ journal.execute(function()
       bases[path] = assert(journal.read(base_file))
       assert(os.remove(base_file))
     end
+  end
+  for index = 2, #arg do
+    add_path(arg[index])
+  end
+  local phrase_path = ".glados/phrases.yaml"
+  if task == "daily" and journal.glados_enabled and journal.read(
+    journal.vault .. "/" .. phrase_path
+  ) then
+    add_path(phrase_path)
   end
   local current_base = bases["journal-current.md"]
   if task == "daily" and local_files["journal-current.md"] then
@@ -285,6 +312,13 @@ journal.execute(function()
           )
         )
         journal.run(git(journal.vault, "merge --ff-only FETCH_HEAD"))
+        journal.speak(
+          "success",
+          "The " .. task .. " journal task was committed and pushed. " .. journal.activity(
+            local_files,
+            paths
+          )
+        )
         print("Published " .. task .. " task.")
         return
       end

@@ -18,7 +18,9 @@ this is a rollup to silently register agent sessions into an obsidian vault
 ## Installation
 
 Lua and Taplo must be on `PATH`. Taplo validates TOML against
-`schemas/config.json`.
+`schemas/config.json`. When enabling GLaDOS, Python 3.11+, `uv`, and the local
+`glados-say` command are also required. `uv` creates the skill's `.venv` and
+installs its Python dependencies from `pyproject.toml`.
 
 ```sh
 lua scripts/install.lua
@@ -30,13 +32,17 @@ path in `~/.obsidian-journal-vault` for subsequent runs. If the configuration is
 missing, invalid according to the schema, or points to another vault, it asks
 for the required values and writes a validated configuration. It saves an
 existing configuration as `.journal.config.toml.invalid-YYYYMMDDHHMMSS` before
-replacing it. A valid configuration for the selected vault is left intact.
+replacing it. A valid configuration for the selected vault is left intact. The
+installer also asks whether to enable local GLaDOS TTS. See
+[glados.md](glados.md) for the voice configuration, authorized context access,
+speech events, and daily phrase refresh behavior.
 
 ## Directory Layout
 
 ```plain
 [vault]/                ← vault absolute path
   .journal.config.toml  ← validated installation configuration
+  .glados/phrases.yaml     ← daily generated phrase list when enabled
   journal-current.md    ← today's active file (only one at root)
   journal/              ← journal base directory
     history.md          ← historic summary
@@ -76,8 +82,9 @@ lua scripts/sync.lua
 `sync.lua` reads the vault selected at installation, validates its
 configuration, pulls its Git branch with `--ff-only`, archives an older
 `journal-current.md`, and creates today's current file. It never replaces an
-existing archive. The vault must be the root of a Git repository with an
-upstream branch.
+existing archive. If GLaDOS is enabled, it also refreshes phrases from Work and
+Files in the last seven archived daily entries. The vault must be the root of a
+Git repository with an upstream branch.
 
 Fill `## Summary` in each newly archived daily file from its entries. Review the
 files, then commit and push only the daily rollover paths:
@@ -156,6 +163,17 @@ fast-forwards the local branch while preserving unrelated staged files. Each
 task gets its own commit message. Conflicting prose is retained from both hosts,
 so review summaries when agents edit the same paragraph.
 
+When GLaDOS is enabled, daily publication also includes `.glados/phrases.yaml`.
+It announces success only after the commit and push. On failure, it speaks the
+failed operation and prints the error needed to correct it. Agents can use
+`uv run --project . python scripts/glados.py context PATH` to read a file under
+an enabled `authorized_dirs` entry and supply a short, request-specific speech
+message with
+`uv run --project . python scripts/glados.py speak EVENT --message TEXT`. Any
+spoken message about a task must briefly describe the user's actual request or
+its result; generic saved phrases are for confirmations and fallback
+notifications.
+
 ## Guardrails
 
 - Keep factual summaries tied to existing entries. The Lua script creates
@@ -170,8 +188,9 @@ so review summaries when agents edit the same paragraph.
 Once this skill is enabled and its vault configuration is valid, journal
 maintenance is standing-authorized. Run the daily rollover, weekly, monthly, and
 history updates, append session entries, and perform their scoped Git fetches,
-commits, and pushes without asking for permission or announcing routine journal
-activity. Report failures that need user action.
+commits, and pushes without asking for permission. When GLaDOS is enabled, speak
+the journal result only after its commit and push; report failures that need
+user action.
 
 If the user asks that a session not be recorded, do not create, append, commit,
 or push a journal entry for that session. Respect that request without asking

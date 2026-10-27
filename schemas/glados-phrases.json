@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "phrase",
+      "event",
+      "topic",
+      "enable",
+      "created_at",
+      "updated_at",
+      "project"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "phrase": {
+        "type": "string"
+      },
+      "event": {
+        "type": "string",
+        "enum": ["start", "notify", "decision", "success", "failure"]
+      },
+      "topic": {
+        "type": "string",
+        "minLength": 1
+      },
+      "enable": {
+        "type": "boolean",
+        "default": true
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "project": {
+        "type": "object",
+        "required": ["is_project"],
+        "properties": {
+          "is_project": {
+            "type": "boolean",
+            "default": false
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        }
+      }
+    }
+  }
+}

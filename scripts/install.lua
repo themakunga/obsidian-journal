@@ -119,6 +119,50 @@ if had_config and valid(config) then
     pipe:close()
   end
   if configured_path == vault then
+    if not succeeds(
+      "taplo get glados.enable --file-path " .. shell_quote(
+        config
+      ) .. " -s >/dev/null 2>&1"
+    ) then
+      if succeeds(
+        "taplo get glados.command --file-path " .. shell_quote(
+          config
+        ) .. " -s >/dev/null 2>&1"
+      ) then
+        fail(
+          "Add glados.enable to the existing [glados] section before reinstalling."
+        )
+      end
+      local enabled
+      repeat
+        enabled = ask("Enable GLaDOS TTS? (y/n)", "n")
+      until enabled == "y" or enabled == "n"
+      local temp = config .. ".tmp-" .. os.time()
+      while exists(temp) do
+        temp = temp .. "-1"
+      end
+      local file = assert(io.open(temp, "w"), "Cannot write " .. temp)
+      assert(
+        file:write(
+          read_file(config):gsub("%s*$", ""),
+          "\n\n[glados]\nenable = ",
+          enabled == "y" and "true" or "false",
+          '\ncommand = "glados-say"\n'
+        )
+      )
+      assert(file:close())
+      if not valid(temp) then
+        os.remove(temp)
+        fail(
+          "Migrated configuration failed schema validation; existing config was kept."
+        )
+      end
+      local ok, error_message = os.rename(temp, config)
+      if not ok then
+        os.remove(temp)
+        fail(error_message)
+      end
+    end
     save_base(vault)
     print("Configuration is already valid: " .. config)
     os.exit(0)
@@ -157,6 +201,10 @@ local function choice(label, options)
 end
 local date_format = choice("Date format", dates)
 local time_format = choice("Time format", times)
+local enabled_glados
+repeat
+  enabled_glados = ask("Enable GLaDOS TTS? (y/n)", "n")
+until enabled_glados == "y" or enabled_glados == "n"
 
 local agents = {}
 repeat
@@ -244,6 +292,7 @@ do
     return toml_string(value):sub(2, -2)
   end)
 end
+rendered = rendered:gsub("{{glados.enable}}", tostring(enabled_glados == "y"))
 
 local temp = config .. ".tmp-" .. os.time()
 while exists(temp) do

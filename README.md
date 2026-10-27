@@ -26,6 +26,8 @@ configuration schema, and development tooling.
 | `scripts/history.lua`       | Update the historical month index                                                         |
 | `scripts/entry.lua`         | Append a validated entry to today's journal                                               |
 | `scripts/publish.lua`       | Publish selected daily, weekly, monthly, history, or entry files with remote race retries |
+| `scripts/glados.py`         | Read authorized context, speak journal status, and refresh phrase catalog                 |
+| `glados.md`                 | Local GLaDOS TTS configuration and behavior                                               |
 
 Templates use `{{...}}` placeholders and `{{#each ...}}` blocks. They are source
 templates rather than rendered vault notes. Run the installer as described in
@@ -38,8 +40,10 @@ working directory, affected files, verification, and pending items. Summary
 templates provide links between daily, weekly, and monthly notes using Obsidian
 wiki-links.
 
-The workflow in `SKILL.md` uses Lua for file changes and Git operations. Agents
-write factual summary prose after the script creates the linked structure.
+The workflow in `SKILL.md` uses Lua for journal operations and Git. The optional
+GLaDOS integration uses Python in its `uv`-managed environment for authorized
+context reads and daily YAML phrase refreshes. Agents write factual summary
+prose after the scripts create the linked structure.
 
 Run the Lua checks with Lua, Taplo, and Git available on `PATH`:
 
@@ -63,12 +67,14 @@ two-space indentation. `.prettierignore` protects compound `.md.hbs` and
 `.toml.hbs` templates from both editor formatting and the Prettier hook, because
 formatting them as HTML corrupts their Markdown or TOML structure.
 
-File checks validate YAML, JSON, and TOML; detect merge markers,
-case-conflicting paths, and private keys; reject newly added files larger than
-500 KB; and fix final newlines and trailing whitespace while preserving Markdown
-line breaks. Markdownlint checks Markdown. The Luacheck hook invokes Nix, which
-downloads and caches Luacheck when needed; neither Luacheck nor LuaRocks needs
-to be installed on the host.
+File checks validate YAML, JSON, and TOML. Yamllint checks YAML style; Prettier
+formats YAML. Other hooks detect merge markers, case-conflicting paths, and
+private keys; reject newly added files larger than 500 KB; and fix final
+newlines and trailing whitespace while preserving Markdown line breaks.
+Markdownlint checks Markdown. YAML and JSON have pinned Prettier support through
+the same hook. The Luacheck hook invokes Nix, which downloads and caches
+Luacheck when needed; neither Luacheck nor LuaRocks needs to be installed on the
+host.
 
 ### Formatting
 

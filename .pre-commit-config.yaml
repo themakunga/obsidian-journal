@@ -16,6 +16,11 @@ repos:
         args: [--markdown-linebreak-ext=md]
       - id: check-merge-conflict
 
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:

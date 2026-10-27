@@ -47,4 +47,5 @@ journal.execute(function()
     )
     print("created: " .. journal.current)
   end
+  journal.refresh_glados()
 end)
