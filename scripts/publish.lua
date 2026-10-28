@@ -215,13 +215,13 @@ journal.execute(function()
     )
   local name = journal.capture(git(journal.vault, "config user.name"))
   local email = journal.capture(git(journal.vault, "config user.email"))
-  local messages = {
-    daily = "docs(journal-daily): roll up ",
-    weekly = "docs(journal-weekly): summarize ",
-    monthly = "docs(journal-monthly): summarize ",
-    history = "docs(journal-history): update ",
-    entry = "docs(journal-entry): record ",
-  }
+  local agent =
+    (os.getenv("AI_AGENT") or ""):match("^([^_]+)") or (os.getenv(
+      "CLAUDECODE"
+    ) and "claude-code") or (os.getenv(
+      "HERMES_AGENT"
+    ) and "hermes") or (os.getenv("CODEX") and "codex") or name
+
   local temp = os.tmpname()
   assert(os.remove(temp))
   journal.run("mkdir " .. journal.quote(temp))
@@ -275,7 +275,9 @@ journal.execute(function()
             ) .. " -c user.email=" .. journal.quote(
               email
             ) .. " -c commit.gpgsign=false commit -m " .. journal.quote(
-              assert(messages[task]) .. journal.today
+              "journal: " .. os.date(
+                "%Y-%m-%dT%H:%M:%S%z"
+              ) .. " - " .. agent .. " - " .. journal.capture("hostname -s")
             ) .. " -- " .. table.concat(selected, " ")
           )
         )

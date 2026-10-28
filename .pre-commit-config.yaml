@@ -48,7 +48,7 @@ repos:
     hooks:
       - id: cspell
         name: cspell
-        entry: cspell lint --config cspell.config.yaml --no-progress
+        entry: cspell lint --config .cspell.config.yaml --no-progress
         language: node
         additional_dependencies: [cspell@8.19.4]
         types: [text]
