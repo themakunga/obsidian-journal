@@ -14,7 +14,7 @@ journal.execute(function()
     end
     if active_date < journal.today then
       local archive =
-        journal.journal .. "/" .. journal.week(
+        journal.journal .. "/weekly/" .. journal.week(
           journal.day_epoch(active_date)
         ) .. "/" .. active_date .. ".md"
       if journal.read(archive) then
@@ -25,7 +25,9 @@ journal.execute(function()
       end
       journal.run(
         "mkdir -p " .. journal.quote(
-          journal.journal .. "/" .. journal.week(journal.day_epoch(active_date))
+          journal.journal .. "/weekly/" .. journal.week(
+            journal.day_epoch(active_date)
+          )
         )
       )
       local archived =

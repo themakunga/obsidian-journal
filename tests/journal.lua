@@ -164,7 +164,8 @@ local ok, message = pcall(function()
   journal("sync")
   local week = formatted("%G-W%V", old_epoch)
   local month = old:sub(1, 7)
-  local archive = "journal/" .. week .. "/" .. old .. ".md"
+  local archive = "journal/weekly/" .. week .. "/" .. old .. ".md"
+  run("test ! -e " .. quote(vault .. "/journal/" .. week))
   assert(read(vault .. "/" .. archive):find("recorded work", 1, true))
   assert(read(vault .. "/" .. archive):find("- recorded work", 1, true))
 
@@ -182,7 +183,13 @@ local ok, message = pcall(function()
   journal("weekly")
   journal("monthly")
   journal("history")
-  assert(read(vault .. "/journal/" .. week .. "/summary.md"):find(old, 1, true))
+  assert(
+    read(vault .. "/journal/weekly/" .. week .. "/summary.md"):find(
+      old,
+      1,
+      true
+    )
+  )
   assert(
     read(vault .. "/journal/monthly/" .. month .. ".md"):find(week, 1, true)
   )
@@ -190,11 +197,11 @@ local ok, message = pcall(function()
 
   local second = formatted("%Y-%m-%d", old_epoch + 86400)
   write(
-    vault .. "/journal/" .. week .. "/" .. second .. ".md",
+    vault .. "/journal/weekly/" .. week .. "/" .. second .. ".md",
     "# Another archived day\n"
   )
-  journal("publish", "daily journal/" .. week .. "/" .. second .. ".md")
-  local weekly = vault .. "/journal/" .. week .. "/summary.md"
+  journal("publish", "daily journal/weekly/" .. week .. "/" .. second .. ".md")
+  local weekly = vault .. "/journal/weekly/" .. week .. "/summary.md"
   write(
     weekly,
     read(weekly):gsub("\n## Days", "\nRetained weekly prose.\n\n## Days", 1)
@@ -202,7 +209,7 @@ local ok, message = pcall(function()
   journal("weekly")
   assert(read(weekly):find("Retained weekly prose.", 1, true))
   assert(read(weekly):find(second, 1, true))
-  journal("publish", "weekly journal/" .. week .. "/summary.md")
+  journal("publish", "weekly journal/weekly/" .. week .. "/summary.md")
 
   local history = vault .. "/journal/history.md"
   write(
@@ -317,15 +324,15 @@ local ok, message = pcall(function()
     weekly,
     read(weekly):gsub("\n## Days", "\nFirst weekly note.\n\n## Days", 1)
   )
-  local other_weekly = other .. "/journal/" .. week .. "/summary.md"
+  local other_weekly = other .. "/journal/weekly/" .. week .. "/summary.md"
   write(
     other_weekly,
     read(other_weekly):gsub("\n## Days", "\nSecond weekly note.\n\n## Days", 1)
   )
-  journal("publish", "weekly journal/" .. week .. "/summary.md")
+  journal("publish", "weekly journal/weekly/" .. week .. "/summary.md")
   journal(
     "publish",
-    "weekly journal/" .. week .. "/summary.md",
+    "weekly journal/weekly/" .. week .. "/summary.md",
     nil,
     other_home
   )

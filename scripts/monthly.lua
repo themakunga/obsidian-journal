@@ -19,7 +19,7 @@ journal.execute(function()
       for week in pairs(by_month[month]) do
         weeks[#weeks + 1] = week
         if not journal.read(
-          journal.journal .. "/" .. week .. "/summary.md"
+          journal.journal .. "/weekly/" .. week .. "/summary.md"
         ) then
           complete = false
         end
@@ -32,7 +32,7 @@ journal.execute(function()
             week = week,
             description = "",
             journal_dir = "journal",
-            marker = "[[journal/" .. week .. "/summary\\|" .. week .. "]]",
+            marker = "[[journal/weekly/" .. week .. "/summary\\|" .. week .. "]]",
           }
         end
         local start = month .. "-01"

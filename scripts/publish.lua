@@ -82,7 +82,7 @@ local function merge_file(temp, path, base, ours, theirs)
     ) and "Days" or path:match(
       "^journal/monthly/"
     ) and "Weeks" or path == "journal/history.md" and "Months" or path:match(
-      "^journal/%d%d%d%d%-W%d%d/"
+      "^journal/weekly/%d%d%d%d%-W%d%d/"
     ) and "Details"
   if not merged:match("^%-%-%-\n.-\n%-%-%-\n") or select(
     2,
@@ -103,11 +103,11 @@ journal.execute(function()
   local allowed = {
     daily = function(path)
       return path == "journal-current.md" or path:match(
-        "^journal/%d%d%d%d%-W%d%d/%d%d%d%d%-%d%d%-%d%d%.md$"
+        "^journal/weekly/%d%d%d%d%-W%d%d/%d%d%d%d%-%d%d%-%d%d%.md$"
       ) or (journal.glados_enabled and path == ".glados/phrases.yaml")
     end,
     weekly = function(path)
-      return path:match("^journal/%d%d%d%d%-W%d%d/summary%.md$")
+      return path:match("^journal/weekly/%d%d%d%d%-W%d%d/summary%.md$")
     end,
     monthly = function(path)
       return path:match("^journal/monthly/%d%d%d%d%-%d%d%.md$")

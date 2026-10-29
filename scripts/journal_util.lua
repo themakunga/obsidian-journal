@@ -271,7 +271,7 @@ function M.day_fields(date)
     year = date:sub(1, 4),
     previous_day = yesterday,
     journal_dir = "journal",
-    journal_base = "journal/" .. M.week(M.day_epoch(yesterday)),
+    journal_base = "journal/weekly/" .. M.week(M.day_epoch(yesterday)),
     previous_week = M.week(epoch - 7 * 86400),
     previous_month = M.previous_month(epoch),
     enable_edit = "true",
@@ -292,7 +292,7 @@ function M.archived_days()
     )
   for path in pipe:lines() do
     local date = path:match("/(%d%d%d%d%-%d%d%-%d%d)%.md$")
-    if date and path == M.journal .. "/" .. M.week(
+    if date and path == M.journal .. "/weekly/" .. M.week(
       M.day_epoch(date)
     ) .. "/" .. date .. ".md" then
       days[#days + 1] = date

@@ -76,7 +76,7 @@ def refresh(vault, config):
         return
     today = date.today()
     recent = []
-    for path in (vault / "journal").glob("????-W??/????-??-??.md"):
+    for path in (vault / "journal").glob("weekly/????-W??/????-??-??.md"):
         try:
             day = date.fromisoformat(path.stem)
         except ValueError:

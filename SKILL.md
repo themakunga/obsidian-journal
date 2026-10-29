@@ -46,9 +46,10 @@ speech events, and daily phrase refresh behavior.
   journal-current.md    ← today's active file (only one at root)
   journal/              ← journal base directory
     history.md          ← historic summary
-    YYYY-Www/           ← weekly directory
-      YYYY-MM-DD.md     ← previous archived daily
-      summary.md        ← weekly summary
+    weekly/             ← weekly directory
+      YYYY-Www/         ← one directory per ISO week
+        YYYY-MM-DD.md   ← previous archived daily
+        summary.md      ← weekly summary
     monthly/            ← monthly directory
       YYYY-MM.md        ← monthly summary
 ```
@@ -90,7 +91,7 @@ Fill `## Summary` in each newly archived daily file from its entries. Review the
 files, then commit and push only the daily rollover paths:
 
 ```sh
-lua scripts/publish.lua daily journal-current.md journal/2026-W43/2026-10-25.md
+lua scripts/publish.lua daily journal-current.md journal/weekly/2026-W43/2026-10-25.md
 ```
 
 Omit the archive path when no day was archived. Publish this daily task before
@@ -99,12 +100,12 @@ appending a new entry to `journal-current.md`.
 ### 2 - Fill Weekly Summary
 
 Run `lua scripts/weekly.lua`. Read the linked archived days in each new or
-updated `journal/YYYY-Www/summary.md`. Fill its `## Summary` with verified work,
-decisions, failures, and pending items. Preserve existing prose and links.
-Commit and push each changed weekly summary as a weekly task:
+updated `journal/weekly/YYYY-Www/summary.md`. Fill its `## Summary` with
+verified work, decisions, failures, and pending items. Preserve existing prose
+and links. Commit and push each changed weekly summary as a weekly task:
 
 ```sh
-lua scripts/publish.lua weekly journal/2026-W43/summary.md
+lua scripts/publish.lua weekly journal/weekly/2026-W43/summary.md
 ```
 
 ### 3 - Fill Monthly Summary

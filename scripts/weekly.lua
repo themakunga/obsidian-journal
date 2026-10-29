@@ -25,7 +25,7 @@ journal.execute(function()
           description = "",
           week = week,
           journal_dir = "journal",
-          marker = "[[journal/" .. week .. "/" .. date .. "\\|" .. date .. "]]",
+          marker = "[[journal/weekly/" .. week .. "/" .. date .. "\\|" .. date .. "]]",
         }
       end
       local fields = {
@@ -42,7 +42,7 @@ journal.execute(function()
         tags = {},
       }
       journal.update_blocks(
-        journal.journal .. "/" .. week .. "/summary.md",
+        journal.journal .. "/weekly/" .. week .. "/summary.md",
         "Days",
         "weekly",
         fields,

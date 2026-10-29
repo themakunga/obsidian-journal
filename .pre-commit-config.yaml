@@ -48,6 +48,7 @@ repos:
     hooks:
       - id: cspell
         name: cspell
+        exclude: ^templates/
         entry: cspell lint --config .cspell.config.yaml --no-progress
         language: node
         additional_dependencies: [cspell@8.19.4]
