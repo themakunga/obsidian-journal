@@ -24,8 +24,7 @@ journal.execute(function()
           date_label = journal.date_label(date),
           description = "",
           week = week,
-          journal_dir = "journal",
-          marker = "[[journal/weekly/" .. week .. "/" .. date .. "\\|" .. date .. "]]",
+          marker = "[[weekly/" .. week .. "/" .. date .. "\\|" .. date .. "]]",
         }
       end
       local fields = {
@@ -34,7 +33,6 @@ journal.execute(function()
         updated_at = journal.today,
         year = week:sub(1, 4),
         week_end = journal.iso(monday + 6 * 86400),
-        journal_dir = "journal",
         enable_edit = "true",
         previous_week = journal.week(monday - 7 * 86400),
         previous_month = journal.previous_month(monday),

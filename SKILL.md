@@ -44,14 +44,14 @@ speech events, and daily phrase refresh behavior.
   .journal.config.toml  ← validated installation configuration
   .glados/phrases.yaml     ← daily generated phrase list when enabled
   journal-current.md    ← today's active file (only one at root)
-  journal/              ← journal base directory
-    history.md          ← historic summary
-    weekly/             ← weekly directory
-      YYYY-Www/         ← one directory per ISO week
-        YYYY-MM-DD.md   ← previous archived daily
-        summary.md      ← weekly summary
-    monthly/            ← monthly directory
-      YYYY-MM.md        ← monthly summary
+  README.md             ← journal overview
+  history.md            ← historic summary
+  weekly/               ← weekly directory
+    YYYY-Www/           ← one directory per ISO week
+      YYYY-MM-DD.md     ← previous archived daily
+      summary.md        ← weekly summary
+  monthly/              ← monthly directory
+    YYYY-MM.md          ← monthly summary
 ```
 
 ## Available templates
@@ -91,7 +91,7 @@ Fill `## Summary` in each newly archived daily file from its entries. Review the
 files, then commit and push only the daily rollover paths:
 
 ```sh
-lua scripts/publish.lua daily journal-current.md journal/weekly/2026-W43/2026-10-25.md
+lua scripts/publish.lua daily journal-current.md weekly/2026-W43/2026-10-25.md
 ```
 
 Omit the archive path when no day was archived. Publish this daily task before
@@ -100,33 +100,33 @@ appending a new entry to `journal-current.md`.
 ### 2 - Fill Weekly Summary
 
 Run `lua scripts/weekly.lua`. Read the linked archived days in each new or
-updated `journal/weekly/YYYY-Www/summary.md`. Fill its `## Summary` with
-verified work, decisions, failures, and pending items. Preserve existing prose
-and links. Commit and push each changed weekly summary as a weekly task:
+updated `weekly/YYYY-Www/summary.md`. Fill its `## Summary` with verified work,
+decisions, failures, and pending items. Preserve existing prose and links.
+Commit and push each changed weekly summary as a weekly task:
 
 ```sh
-lua scripts/publish.lua weekly journal/weekly/2026-W43/summary.md
+lua scripts/publish.lua weekly weekly/2026-W43/summary.md
 ```
 
 ### 3 - Fill Monthly Summary
 
-Run `lua scripts/monthly.lua`. For each new or updated
-`journal/monthly/YYYY-MM.md`, read its linked weekly summaries and fill
-`## Summary` with a factual overview. A month is created after all its linked
-weeks have summaries. Commit and push changed monthly summaries separately:
+Run `lua scripts/monthly.lua`. For each new or updated `monthly/YYYY-MM.md`,
+read its linked weekly summaries and fill `## Summary` with a factual overview.
+A month is created after all its linked weeks have summaries. Commit and push
+changed monthly summaries separately:
 
 ```sh
-lua scripts/publish.lua monthly journal/monthly/2026-10.md
+lua scripts/publish.lua monthly monthly/2026-10.md
 ```
 
 ### 4 - Fill History Summary
 
-Run `lua scripts/history.lua`. Read `journal/history.md` and the linked monthly
+Run `lua scripts/history.lua`. Read `history.md` and the linked monthly
 summaries. Fill or update its `## Summary` using only completed months. Keep
 existing month links and prose. Commit and push the history task separately:
 
 ```sh
-lua scripts/publish.lua history journal/history.md
+lua scripts/publish.lua history history.md
 ```
 
 ### 5 - Write entry

@@ -216,7 +216,7 @@ end
 M.today = os.date("%Y-%m-%d")
 M.today_epoch = M.day_epoch(M.today)
 M.current = M.vault .. "/journal-current.md"
-M.journal = M.vault .. "/journal"
+M.journal = M.vault
 
 function M.speak(event, message)
   if not M.glados_enabled then
@@ -270,8 +270,7 @@ function M.day_fields(date)
     month = date:sub(1, 7),
     year = date:sub(1, 4),
     previous_day = yesterday,
-    journal_dir = "journal",
-    journal_base = "journal/weekly/" .. M.week(M.day_epoch(yesterday)),
+    journal_base = "weekly/" .. M.week(M.day_epoch(yesterday)),
     previous_week = M.week(epoch - 7 * 86400),
     previous_month = M.previous_month(epoch),
     enable_edit = "true",

@@ -31,8 +31,7 @@ journal.execute(function()
           items[#items + 1] = {
             week = week,
             description = "",
-            journal_dir = "journal",
-            marker = "[[journal/weekly/" .. week .. "/summary\\|" .. week .. "]]",
+            marker = "[[weekly/" .. week .. "/summary\\|" .. week .. "]]",
           }
         end
         local start = month .. "-01"
@@ -54,7 +53,6 @@ journal.execute(function()
           month_end = month_end,
           month_label = os.date("%B", epoch),
           prev_month = journal.previous_month(epoch),
-          journal_dir = "journal",
           enable_edit = "true",
           summary = "",
           tags = {},

@@ -26,8 +26,7 @@ journal.execute(function()
     items[#items + 1] = {
       month = month,
       description = "",
-      journal_dir = "journal",
-      marker = "[[journal/monthly/" .. month .. "\\|" .. month .. "]]",
+      marker = "[[monthly/" .. month .. "\\|" .. month .. "]]",
     }
   end
   local last = months[#months]
@@ -39,7 +38,6 @@ journal.execute(function()
     updated_date = journal.today,
     initial_month = months[1],
     last_month = last,
-    journal_dir = "journal",
     month_label = os.date("%B", journal.day_epoch(last .. "-01")),
     year = last:sub(1, 4),
     tags = {},
@@ -48,11 +46,10 @@ journal.execute(function()
   journal.update_blocks(history, "Months", "historic", fields, "months", items)
   local content = assert(journal.read(history), "Missing history after update")
   local previous =
-    content:match("| Last Month%s*| %[%[journal/monthly/(%d%d%d%d%-%d%d)")
+    content:match("| Last Month%s*| %[%[monthly/(%d%d%d%d%-%d%d)")
   if previous and previous ~= last then
-    local old_link =
-      "[[journal/monthly/" .. previous .. "\\|" .. previous .. "]]"
-    local new_link = "[[journal/monthly/" .. last .. "\\|" .. last .. "]]"
+    local old_link = "[[monthly/" .. previous .. "\\|" .. previous .. "]]"
+    local new_link = "[[monthly/" .. last .. "\\|" .. last .. "]]"
     local row = content:find("| Last Month", 1, true)
     if not row then
       journal.abort("Missing Last Month in " .. history)

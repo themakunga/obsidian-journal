@@ -120,7 +120,7 @@ local ok, message = pcall(function()
     )
   )
   journal("publish", "daily journal-current.md")
-  assert(read(vault .. "/journal/README.md"):find("# test", 1, true))
+  assert(read(vault .. "/README.md"):find("# test", 1, true))
   local entry = temp .. "/entry.md"
   write(
     entry,
@@ -164,8 +164,8 @@ local ok, message = pcall(function()
   journal("sync")
   local week = formatted("%G-W%V", old_epoch)
   local month = old:sub(1, 7)
-  local archive = "journal/weekly/" .. week .. "/" .. old .. ".md"
-  run("test ! -e " .. quote(vault .. "/journal/" .. week))
+  local archive = "weekly/" .. week .. "/" .. old .. ".md"
+  run("test ! -e " .. quote(vault .. "/journal"))
   assert(read(vault .. "/" .. archive):find("recorded work", 1, true))
   assert(read(vault .. "/" .. archive):find("- recorded work", 1, true))
 
@@ -183,25 +183,17 @@ local ok, message = pcall(function()
   journal("weekly")
   journal("monthly")
   journal("history")
-  assert(
-    read(vault .. "/journal/weekly/" .. week .. "/summary.md"):find(
-      old,
-      1,
-      true
-    )
-  )
-  assert(
-    read(vault .. "/journal/monthly/" .. month .. ".md"):find(week, 1, true)
-  )
-  assert(read(vault .. "/journal/history.md"):find(month, 1, true))
+  assert(read(vault .. "/weekly/" .. week .. "/summary.md"):find(old, 1, true))
+  assert(read(vault .. "/monthly/" .. month .. ".md"):find(week, 1, true))
+  assert(read(vault .. "/history.md"):find(month, 1, true))
 
   local second = formatted("%Y-%m-%d", old_epoch + 86400)
   write(
-    vault .. "/journal/weekly/" .. week .. "/" .. second .. ".md",
+    vault .. "/weekly/" .. week .. "/" .. second .. ".md",
     "# Another archived day\n"
   )
-  journal("publish", "daily journal/weekly/" .. week .. "/" .. second .. ".md")
-  local weekly = vault .. "/journal/weekly/" .. week .. "/summary.md"
+  journal("publish", "daily weekly/" .. week .. "/" .. second .. ".md")
+  local weekly = vault .. "/weekly/" .. week .. "/summary.md"
   write(
     weekly,
     read(weekly):gsub("\n## Days", "\nRetained weekly prose.\n\n## Days", 1)
@@ -209,9 +201,9 @@ local ok, message = pcall(function()
   journal("weekly")
   assert(read(weekly):find("Retained weekly prose.", 1, true))
   assert(read(weekly):find(second, 1, true))
-  journal("publish", "weekly journal/weekly/" .. week .. "/summary.md")
+  journal("publish", "weekly weekly/" .. week .. "/summary.md")
 
-  local history = vault .. "/journal/history.md"
+  local history = vault .. "/history.md"
   write(
     history,
     read(history):gsub(
@@ -230,21 +222,16 @@ local ok, message = pcall(function()
     })
   )
   assert(later > month)
-  write(
-    vault .. "/journal/monthly/" .. later .. ".md",
-    "# Later completed month\n"
-  )
+  write(vault .. "/monthly/" .. later .. ".md", "# Later completed month\n")
   journal(
     "publish",
-    "monthly journal/monthly/" .. month .. ".md journal/monthly/" .. later .. ".md"
+    "monthly monthly/" .. month .. ".md monthly/" .. later .. ".md"
   )
   journal("history")
   assert(read(history):find("Retained history prose.", 1, true))
   assert(read(history):find("| Last Month", 1, true))
-  assert(
-    read(history):find("journal/monthly/" .. later .. "\\|" .. later, 1, true)
-  )
-  journal("publish", "history journal/history.md")
+  assert(read(history):find("monthly/" .. later .. "\\|" .. later, 1, true))
+  journal("publish", "history history.md")
 
   journal("entry", "Codex", entry)
   local mixed_daily =
@@ -281,7 +268,7 @@ local ok, message = pcall(function()
       )
     )
   for path in changed:read("*a"):gmatch("[^\n]+") do
-    assert(path == "journal-current.md" or path == "journal/README.md")
+    assert(path == "journal-current.md" or path == "README.md")
   end
   assert(changed:close())
 
@@ -324,24 +311,19 @@ local ok, message = pcall(function()
     weekly,
     read(weekly):gsub("\n## Days", "\nFirst weekly note.\n\n## Days", 1)
   )
-  local other_weekly = other .. "/journal/weekly/" .. week .. "/summary.md"
+  local other_weekly = other .. "/weekly/" .. week .. "/summary.md"
   write(
     other_weekly,
     read(other_weekly):gsub("\n## Days", "\nSecond weekly note.\n\n## Days", 1)
   )
-  journal("publish", "weekly journal/weekly/" .. week .. "/summary.md")
-  journal(
-    "publish",
-    "weekly journal/weekly/" .. week .. "/summary.md",
-    nil,
-    other_home
-  )
+  journal("publish", "weekly weekly/" .. week .. "/summary.md")
+  journal("publish", "weekly weekly/" .. week .. "/summary.md", nil, other_home)
   local summary = read(other_weekly)
   assert(summary:find("First weekly note.", 1, true))
   assert(summary:find("Second weekly note.", 1, true))
   assert(not summary:find("<<<<<<<", 1, true))
 
-  local new_month = "journal/monthly/2000-01.md"
+  local new_month = "monthly/2000-01.md"
   write(
     vault .. "/" .. new_month,
     "---\nid: same\n---\n\n## Summary\n\nFirst month note.\n\n## Weeks\n"

@@ -80,9 +80,9 @@ local function merge_file(temp, path, base, ours, theirs)
     path == "journal-current.md" and "Details" or path:match(
       "/summary%.md$"
     ) and "Days" or path:match(
-      "^journal/monthly/"
-    ) and "Weeks" or path == "journal/history.md" and "Months" or path:match(
-      "^journal/weekly/%d%d%d%d%-W%d%d/"
+      "^monthly/"
+    ) and "Weeks" or path == "history.md" and "Months" or path:match(
+      "^weekly/%d%d%d%d%-W%d%d/"
     ) and "Details"
   if not merged:match("^%-%-%-\n.-\n%-%-%-\n") or select(
     2,
@@ -103,17 +103,17 @@ journal.execute(function()
   local allowed = {
     daily = function(path)
       return path == "journal-current.md" or path:match(
-        "^journal/weekly/%d%d%d%d%-W%d%d/%d%d%d%d%-%d%d%-%d%d%.md$"
+        "^weekly/%d%d%d%d%-W%d%d/%d%d%d%d%-%d%d%-%d%d%.md$"
       ) or (journal.glados_enabled and path == ".glados/phrases.yaml")
     end,
     weekly = function(path)
-      return path:match("^journal/weekly/%d%d%d%d%-W%d%d/summary%.md$")
+      return path:match("^weekly/%d%d%d%d%-W%d%d/summary%.md$")
     end,
     monthly = function(path)
-      return path:match("^journal/monthly/%d%d%d%d%-%d%d%.md$")
+      return path:match("^monthly/%d%d%d%d%-%d%d%.md$")
     end,
     history = function(path)
-      return path == "journal/history.md"
+      return path == "history.md"
     end,
     entry = function(path)
       return path == "journal-current.md"
@@ -260,8 +260,7 @@ journal.execute(function()
       for _, path in ipairs(paths) do
         selected[#selected + 1] = journal.quote(path)
       end
-      journal.run("mkdir -p " .. journal.quote(checkout .. "/journal"))
-      local readme_path = checkout .. "/journal/README.md"
+      local readme_path = checkout .. "/README.md"
       local vault_name =
         journal.capture(
           "taplo get core.name --file-path " .. journal.quote(
@@ -292,7 +291,7 @@ journal.execute(function()
           readme:gsub("%s*$", "") .. "\n\n## Publishing\n\n" .. pub_line .. "\n"
         )
       end
-      selected[#selected + 1] = journal.quote("journal/README.md")
+      selected[#selected + 1] = journal.quote("README.md")
       journal.run(git(checkout, "add -- " .. table.concat(selected, " ")))
       if not journal.succeeds(
         git(

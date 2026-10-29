@@ -24,7 +24,7 @@ assert(current:find("<b>&", 1, true))
 assert(current:find("- <b>&", 1, true))
 assert(current:find("- **file**", 1, true))
 assert(current:find("<&", 1, true))
-assert(current:find("[[journal/weekly/", 1, true))
+assert(current:find("[[weekly/", 1, true))
 fields.entries = fields.entry
 local daily = journal.render("daily", fields)
 assert(daily:find("<b>&", 1, true))
