@@ -260,6 +260,59 @@ journal.execute(function()
       for _, path in ipairs(paths) do
         selected[#selected + 1] = journal.quote(path)
       end
+      local readme_path = checkout .. "/journal/README.md"
+      local vault_name =
+        journal.capture(
+          "dasel -f " .. journal.quote(
+            journal.config
+          ) .. " 'core.name' 2>/dev/null"
+        ) or journal.vault:match("([^/]+)$") or "Journal"
+      local host = journal.capture("hostname -s")
+      local pub_line =
+        "_Last published: " .. os.date(
+          "%Y-%m-%dT%H:%M:%S%z"
+        ) .. " by " .. agent .. " on " .. host .. "_"
+      local readme = journal.read(readme_path)
+      if not readme then
+        journal.write(
+          readme_path,
+          table.concat(
+            {
+              "# " .. vault_name,
+              "",
+              "Personal journal entries for **" .. name .. "**, managed and published",
+              "automatically by GLaDOS agents across multiple hosts.",
+              "",
+              "Each entry captures daily reflections, weekly summaries, and monthly",
+              "retrospectives, stored as plain Markdown files and version-controlled in Git.",
+              "",
+              "## Structure",
+              "",
+              "| Path | Content |",
+              "|------|---------|",
+              "| `YYYY-WNN/YYYY-MM-DD.md` | Daily entries |",
+              "| `YYYY-WNN/summary.md` | Weekly summary |",
+              "| `monthly/YYYY-MM.md` | Monthly retrospective |",
+              "| `history.md` | Long-form cumulative history |",
+              "",
+              "## Publishing",
+              "",
+              pub_line,
+              "",
+            },
+            "\n"
+          )
+        )
+      elseif readme:find("_Last published:") then
+        readme = readme:gsub("_Last published:[^\n]*_", pub_line)
+        journal.write(readme_path, readme)
+      else
+        journal.write(
+          readme_path,
+          readme:gsub("%s*$", "") .. "\n\n## Publishing\n\n" .. pub_line .. "\n"
+        )
+      end
+      selected[#selected + 1] = journal.quote("journal/README.md")
       journal.run(git(checkout, "add -- " .. table.concat(selected, " ")))
       if not journal.succeeds(
         git(
