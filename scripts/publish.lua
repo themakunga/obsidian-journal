@@ -260,13 +260,14 @@ journal.execute(function()
       for _, path in ipairs(paths) do
         selected[#selected + 1] = journal.quote(path)
       end
+      journal.run("mkdir -p " .. journal.quote(checkout .. "/journal"))
       local readme_path = checkout .. "/journal/README.md"
       local vault_name =
         journal.capture(
-          "dasel -f " .. journal.quote(
+          "taplo get core.name --file-path " .. journal.quote(
             journal.config
-          ) .. " 'core.name' 2>/dev/null"
-        ) or journal.vault:match("([^/]+)$") or "Journal"
+          ) .. " -s"
+        )
       local host = journal.capture("hostname -s")
       local pub_line =
         "_Last published: " .. os.date(

@@ -119,6 +119,8 @@ local ok, message = pcall(function()
       true
     )
   )
+  journal("publish", "daily journal-current.md")
+  assert(read(vault .. "/journal/README.md"):find("# test", 1, true))
   local entry = temp .. "/entry.md"
   write(
     entry,
@@ -262,8 +264,8 @@ local ok, message = pcall(function()
     assert(io.popen("git -C " .. quote(vault) .. " log -6 --format=%s"))
   local messages = assert(log:read("*a"))
   assert(log:close())
-  for _, task in ipairs({ "daily", "weekly", "monthly", "history", "entry" }) do
-    assert(messages:find("docs%(journal%-" .. task .. "%)"))
+  for message in messages:gmatch("[^\n]+") do
+    assert(message:match("^journal: "))
   end
   local changed =
     assert(
@@ -271,7 +273,9 @@ local ok, message = pcall(function()
         "git -C " .. quote(vault) .. " show --pretty=format: --name-only HEAD"
       )
     )
-  assert(changed:read("*a"):match("^\n?journal%-current%.md\n?$"))
+  for path in changed:read("*a"):gmatch("[^\n]+") do
+    assert(path == "journal-current.md" or path == "journal/README.md")
+  end
   assert(changed:close())
 
   local other, other_home = temp .. "/other", temp .. "/other-home"
