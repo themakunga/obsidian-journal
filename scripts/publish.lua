@@ -276,32 +276,11 @@ journal.execute(function()
       if not readme then
         journal.write(
           readme_path,
-          table.concat(
-            {
-              "# " .. vault_name,
-              "",
-              "Personal journal entries for **" .. name .. "**, managed and published",
-              "automatically by GLaDOS agents across multiple hosts.",
-              "",
-              "Each entry captures daily reflections, weekly summaries, and monthly",
-              "retrospectives, stored as plain Markdown files and version-controlled in Git.",
-              "",
-              "## Structure",
-              "",
-              "| Path | Content |",
-              "|------|---------|",
-              "| `YYYY-WNN/YYYY-MM-DD.md` | Daily entries |",
-              "| `YYYY-WNN/summary.md` | Weekly summary |",
-              "| `monthly/YYYY-MM.md` | Monthly retrospective |",
-              "| `history.md` | Long-form cumulative history |",
-              "",
-              "## Publishing",
-              "",
-              pub_line,
-              "",
-            },
-            "\n"
-          )
+          journal.render("journal-readme", {
+            vault_name = vault_name,
+            author = name,
+            pub_line = pub_line,
+          })
         )
       elseif readme:find("_Last published:") then
         readme = readme:gsub("_Last published:[^\n]*_", pub_line)

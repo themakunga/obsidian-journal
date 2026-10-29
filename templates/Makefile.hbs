@@ -1,0 +1,12 @@
+.PHONY: update init
+
+# Pull the latest journal entries from the remote repository.
+update:
+	git -C {{vault}} pull
+
+# Initialize this directory as an Obsidian vault.
+# Creates .obsidian/ with a minimal app.json if not already present.
+init:
+	@mkdir -p {{vault}}/.obsidian
+	@[ -f {{vault}}/.obsidian/app.json ] || printf '{}\n' > {{vault}}/.obsidian/app.json
+	@echo "Obsidian vault initialized at {{vault}}"

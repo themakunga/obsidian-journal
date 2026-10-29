@@ -33,6 +33,19 @@ Templates use `{{...}}` placeholders and `{{#each ...}}` blocks. They are source
 templates rather than rendered vault notes. Run the installer as described in
 `SKILL.md` to create or repair `.journal.config.toml` in a vault.
 
+## Vault Makefile
+
+`scripts/install.lua` writes a `Makefile` to the vault root on first install. It
+is not overwritten on reinstall, so manual edits are preserved.
+
+| Target   | Command       | Description                                                                                                |
+| -------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `update` | `make update` | Runs `git pull` on the vault to fetch the latest published entries from the remote.                        |
+| `init`   | `make init`   | Creates `.obsidian/` and a minimal `app.json` if missing, initializing the directory as an Obsidian vault. |
+
+The paths are embedded at install time, so both targets work regardless of the
+working directory.
+
 ## Journal content
 
 Session templates capture the time, session hash, agent, host, work performed,

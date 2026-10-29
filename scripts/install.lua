@@ -333,3 +333,18 @@ print("Configuration written: " .. config)
 if backup then
   print("Previous configuration saved: " .. backup)
 end
+
+local makefile_path = vault .. "/Makefile"
+if not exists(makefile_path) then
+  local rendered_mk = read_file(root .. "/templates/Makefile.hbs"):gsub(
+    "{{vault}}",
+    function()
+      return vault
+    end
+  )
+  local mf =
+    assert(io.open(makefile_path, "w"), "Cannot write " .. makefile_path)
+  assert(mf:write(rendered_mk))
+  assert(mf:close())
+  print("Makefile written: " .. makefile_path)
+end

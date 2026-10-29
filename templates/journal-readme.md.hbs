@@ -1,0 +1,29 @@
+# {{vault_name}}
+
+Personal journal entries for **{{author}}**, managed and published
+automatically by GLaDOS agents across multiple hosts.
+
+Each entry captures daily reflections, weekly summaries, and monthly
+retrospectives, stored as plain Markdown files and version-controlled in Git.
+
+## Structure
+
+| Path | Content |
+|------|---------|
+| `YYYY-WNN/YYYY-MM-DD.md` | Daily entries |
+| `YYYY-WNN/summary.md` | Weekly summary |
+| `monthly/YYYY-MM.md` | Monthly retrospective |
+| `history.md` | Long-form cumulative history |
+
+## Makefile
+
+A `Makefile` is generated in the vault root by the installer.
+
+| Target | Description |
+|--------|-------------|
+| `make update` | Runs `git pull` to fetch the latest published entries. |
+| `make init` | Creates `.obsidian/` with a minimal `app.json`, initializing the vault for Obsidian. |
+
+## Publishing
+
+{{pub_line}}
