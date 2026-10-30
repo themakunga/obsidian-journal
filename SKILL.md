@@ -1,17 +1,29 @@
 ---
 name: obsidian-journal
-description: Record agent work in an Obsidian vault and maintain daily, weekly, monthly, and historical journals.
-created_at: 2026-10-25T17:00:00
-updated_at: 2026-10-25T22:00:00
-owner: TheMakunga
-repo: obsidian-journal
+description: Maintain an installed Obsidian journal at session start and after meaningful agent work. Sync daily, weekly, monthly, and historical summaries, then record verified results and publish them.
+metadata:
+  created_at: 2026-10-25T17:00:00
+  updated_at: 2026-10-30T00:00:00
+  owner: TheMakunga
+  repo: obsidian-journal
 ---
 
 # Obsidian Journal
 
-## Description
+## Activation
 
-this is a rollup to silently register agent sessions into an obsidian vault
+When `~/.obsidian-journal-vault` selects an existing, configured vault, run
+steps 1-4 at session start and steps 5-6 after meaningful work. Record verified
+results, including failures and pending work; greetings alone need no entry.
+Routine journal maintenance is silent except for configured voice announcements
+or errors requiring user action. An explicit request to skip recording takes
+precedence.
+
+Installing this skill makes it discoverable; it does not install lifecycle
+hooks. The agent runs the workflow. Journal speech follows `[glados].enable` and
+the user's current voice instructions. Keep that setting unchanged during
+routine maintenance; change it only when the user requests a voice change. See
+[glados.md](glados.md) for separate coding-agent hooks and voice checks.
 
 ---
 

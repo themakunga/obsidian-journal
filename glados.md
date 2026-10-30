@@ -24,6 +24,31 @@ The installer asks whether to enable GLaDOS and defaults to disabled. Python
 3.11 or newer and `uv` are needed for `scripts/glados.py`. The skill keeps its
 PyYAML dependency in its own `uv`-managed `.venv`.
 
+## Coding-agent hooks
+
+Journal announcements run from the journal scripts. Codex status speech runs
+from separate lifecycle hooks; enabling `[glados]` does not install those hooks.
+When the user requests status speech, reuse the existing installer from the
+`nix-systems` checkout:
+
+```sh
+python3 modules/applications/glados-tts/install-hooks.py /path/to/nix-built/bin
+```
+
+Pass the directory containing the Nix-built `glados-hook` and `glados-say`
+executables, such as a Nix system profile. Each command's individual package
+directory may contain only that command. The installer merges Codex and Claude
+hooks, preserves other settings, and keeps backups. Inspect
+`~/.codex/hooks.json` for `UserPromptSubmit`, `PreToolUse`, `PermissionRequest`,
+and `Stop` handlers. In Codex, review the installed definitions through
+`/hooks`, then start a new session. Codex skips new or changed hooks until the
+user trusts them; leave its trust records to Codex. See the
+[official hook documentation](https://learn.chatgpt.com/docs/hooks).
+
+For missing audio, check journal enablement, the applicable lifecycle hooks, and
+`~/.config/glados-tts/muted` separately. Test `glados-say` only when voice is
+authorized. A successful configuration check does not verify audio playback.
+
 ## Behavior
 
 - An agent can read a file or list a directory only when it falls under an
