@@ -29,6 +29,10 @@
         "type": "string",
         "minLength": 1
       },
+      "origin": {
+        "type": "string",
+        "enum": ["daily"]
+      },
       "enable": {
         "type": "boolean",
         "default": true

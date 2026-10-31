@@ -75,6 +75,14 @@ authorized. A successful configuration check does not verify audio playback.
   includes this file automatically when GLaDOS is enabled. Each list item
   records its UUID, phrase, event, topic, enabled state, dates, and project
   scope. `schemas/glados-phrases.json` describes that record shape.
+- In the first journal session of each local day, the agent writes two fresh
+  sarcastic completion phrases per active authorized directory and passes them
+  to `glados.py renew` as JSON. The command retires an older phrase of the same
+  topic for each addition, preserves disabled flags and skips directories
+  already renewed today. Daily additions carry `origin: daily`; refresh keeps
+  them for seven days while their scope and topic stay active. New wording is
+  written by the agent, with no model API or background scheduler in the
+  scripts.
 
 The model is trained in English. Every topic keeps GLaDOS dry, sarcastic
 personality in one or two short sentences. Automatic speech uses the scoped

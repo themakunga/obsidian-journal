@@ -1,7 +1,9 @@
 """Run with python -m unittest discover -s tests -p 'test_glados.py'."""
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 import importlib.util
+import io
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -128,6 +130,95 @@ class ScopedPhrases(unittest.TestCase):
         old["project"] = {"is_project": False}
         (self.vault / ".glados/phrases.yaml").write_text(yaml.safe_dump([old]))
         self.assertFalse(self.refresh(text)[0]["enable"])
+
+    def proposals(self):
+        return [
+            {"topic": "code", "phrase": phrase,
+             "project": {"is_project": True, "path": str(self.project)}}
+            for phrase in ["New code. The bugs have requested introductions.",
+                           "Another script. Entropy appreciates your contribution."]
+        ]
+
+    def test_daily_renewal_replaces_two_and_is_idempotent(self):
+        text = self.entry(self.project, "Python script")
+        original = self.refresh(text)
+        self.assertTrue(glados.renew(self.vault, self.config, self.proposals()))
+        path = self.vault / ".glados/phrases.yaml"
+        records = yaml.safe_load(path.read_text())
+        active = [item for item in records if item["enable"] and item["event"] == "success"]
+        self.assertEqual({item["phrase"] for item in active}, {item["phrase"] for item in self.proposals()})
+        self.assertTrue(all(item["origin"] == "daily" for item in active))
+        self.assertEqual(len(records), len(original) + 2)
+        before = path.read_bytes()
+        self.assertFalse(glados.renew(self.vault, self.config, self.proposals()))
+        self.assertEqual(path.read_bytes(), before)
+        self.assertEqual(self.refresh(text), records)
+
+    def test_daily_renewal_rejects_invalid_input_without_writing(self):
+        self.refresh(self.entry(self.project, "Python script"))
+        path = self.vault / ".glados/phrases.yaml"
+        before = path.read_bytes()
+        bad = self.proposals()
+        bad[1]["project"]["path"] = str(self.other)
+        for proposals in [[], self.proposals()[:1], bad,
+                          [self.proposals()[0], self.proposals()[0]]]:
+            with self.assertRaises(ValueError):
+                glados.renew(self.vault, self.config, proposals)
+            self.assertEqual(path.read_bytes(), before)
+
+    def test_daily_phrases_expire_and_inactive_topics_are_removed(self):
+        text = self.entry(self.project, "Python script")
+        self.refresh(text)
+        glados.renew(self.vault, self.config, self.proposals())
+        path = self.vault / ".glados/phrases.yaml"
+        records = yaml.safe_load(path.read_text())
+        for item in records:
+            if item.get("origin") == "daily":
+                item["created_at"] = (date.today() - timedelta(days=8)).isoformat() + "T12:00:00+00:00"
+        path.write_text(yaml.safe_dump(records))
+        self.assertFalse(any(item.get("origin") == "daily" for item in self.refresh(text)))
+        self.assertEqual(self.refresh(self.entry(self.other, "Python script")), [])
+
+    def test_daily_renewal_runs_again_on_the_next_local_day(self):
+        self.refresh(self.entry(self.project, "Python script"))
+        glados.renew(self.vault, self.config, self.proposals())
+        tomorrow = datetime.now(timezone.utc) + timedelta(days=1)
+
+        class NextDate(date):
+            @classmethod
+            def today(cls):
+                return tomorrow.astimezone().date()
+
+        class NextTime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return tomorrow.astimezone(tz)
+
+        proposals = self.proposals()
+        for item in proposals:
+            item["phrase"] += " Again."
+        with patch.object(glados, "date", NextDate), patch.object(glados, "datetime", NextTime):
+            self.assertTrue(glados.renew(self.vault, self.config, proposals))
+            self.assertFalse(glados.renew(self.vault, self.config, proposals))
+        records = yaml.safe_load((self.vault / ".glados/phrases.yaml").read_text())
+        self.assertEqual(len({item["id"] for item in records}), len(records))
+
+    def test_renew_command_respects_lock_and_cleans_up_invalid_input(self):
+        self.refresh(self.entry(self.project, "Python script"))
+        path = self.vault / ".glados/phrases.yaml"
+        before = path.read_bytes()
+        lock = self.vault / ".journal.lock"
+        lock.mkdir()
+        with patch.object(glados, "load_config", return_value=(self.vault, self.config)):
+            with self.assertRaises(FileExistsError):
+                glados.main(["renew"])
+            self.assertTrue(lock.is_dir())
+            lock.rmdir()
+            with patch.object(glados.sys, "stdin", io.StringIO("invalid JSON")):
+                with self.assertRaises(json.JSONDecodeError):
+                    glados.main(["renew"])
+        self.assertFalse(lock.exists())
+        self.assertEqual(path.read_bytes(), before)
 
 
 if __name__ == "__main__":

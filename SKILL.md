@@ -99,6 +99,30 @@ existing archive. If GLaDOS is enabled, it also refreshes phrases from Work and
 Files in the last seven archived daily entries. The vault must be the root of a
 Git repository with an upstream branch.
 
+When GLaDOS is enabled, renew its wording once per local day for each enabled
+directory with topics in the refreshed catalog. If that directory already has an
+`origin: daily` record created today, keep it. Otherwise, read its recent Work
+and Files context and write two new, dryly sarcastic English completion phrases,
+each at most 100 characters. Alternate active topics, avoid existing phrases,
+and make no claims about unverified results. Use only topics and project scopes
+present in the catalog; stay silent for inactive directories.
+
+Pass a JSON list of two objects with `phrase`, `topic`, and
+`project: {"is_project": true, "path": "/configured/directory"}` to:
+
+```sh
+uv run --project . python scripts/glados.py renew < /tmp/glados-daily.json
+```
+
+The command validates the directory, retires an older enabled completion phrase
+of the same topic for each addition, and keeps stable daily IDs to avoid
+duplicates across agents. It uses the journal lock and skips a directory already
+renewed today. Sync preserves daily additions for seven days while their topic
+and directory remain active, then removes them. Retired template phrases stay
+disabled so refresh cannot bring them back. The agent writes the new wording;
+scripts do not call a model or generate prose. Renewal runs during the first
+journal session of the day, rather than on an unattended midnight schedule.
+
 Fill `## Summary` in each newly archived daily file from its entries. Review the
 files, then commit and push only the daily rollover paths:
 

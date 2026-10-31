@@ -66,7 +66,27 @@ def phrase_records(source, projects, existing):
                         "project": {"is_project": True, "path": str(root)},
                     }
                 )
+    active = {(str(root), topic) for root, topic in projects}
+    for item in existing:
+        if not isinstance(item, dict) or item.get("origin") != "daily":
+            continue
+        day = datetime.fromisoformat(item["created_at"]).astimezone().date()
+        scope = (item.get("project", {}).get("path"), item.get("topic"))
+        if scope in active and date.today() - timedelta(days=7) < day <= date.today():
+            records.append(item)
     return records
+
+
+def write_catalog(vault, records):
+    destination = vault / ".glados/phrases.yaml"
+    encoded = yaml.safe_dump(records, allow_unicode=True, sort_keys=False)
+    if destination.exists() and destination.read_text() == encoded:
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    fd, name = tempfile.mkstemp(dir=destination.parent, prefix=".glados-")
+    with os.fdopen(fd, "w") as stream:
+        stream.write(encoded)
+    os.replace(name, destination)
 
 
 def refresh(vault, config):
@@ -104,14 +124,61 @@ def refresh(vault, config):
     destination = vault / ".glados/phrases.yaml"
     existing = yaml.safe_load(destination.read_text()) if destination.exists() else []
     records = phrase_records(source, sorted(topics), existing or [])
-    encoded = yaml.safe_dump(records, allow_unicode=True, sort_keys=False)
-    if destination.exists() and destination.read_text() == encoded:
-        return
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    fd, name = tempfile.mkstemp(dir=destination.parent, prefix=".glados-")
-    with os.fdopen(fd, "w") as stream:
-        stream.write(encoded)
-    os.replace(name, destination)
+    write_catalog(vault, records)
+
+
+def renew(vault, config, proposals):
+    if not config.get("glados", {}).get("enable", False):
+        raise ValueError("GLaDOS is disabled in .journal.config.toml")
+    if not isinstance(proposals, list) or len(proposals) != 2:
+        raise ValueError("Supply exactly two new phrases for one active directory")
+    records = yaml.safe_load((vault / ".glados/phrases.yaml").read_text()) or []
+    active = {(item["project"].get("path"), item["topic"]) for item in records}
+    roots, phrases = set(), set()
+    for item in proposals:
+        if not isinstance(item, dict) or not isinstance(item.get("project"), dict):
+            raise ValueError("Each phrase needs a topic, phrase and project scope")
+        project = item["project"]
+        phrase = item.get("phrase")
+        if (project.get("is_project") is not True
+                or not isinstance(project.get("path"), str)
+                or not isinstance(item.get("topic"), str)
+                or (project.get("path"), item.get("topic")) not in active):
+            raise ValueError("Phrase topic and directory must match the refreshed catalog")
+        root = allowed_root(config, project["path"])
+        if not isinstance(phrase, str) or not 0 < len(phrase) <= 100 or phrase != " ".join(phrase.split()):
+            raise ValueError("Each phrase must be a single short line of at most 100 characters")
+        roots.add(str(root))
+        phrases.add(phrase)
+    if len(roots) != 1 or len(phrases) != 2:
+        raise ValueError("Supply two distinct phrases for the same directory")
+    root = roots.pop()
+    today = date.today()
+    if any(item.get("origin") == "daily"
+           and item["project"].get("path") == root
+           and datetime.fromisoformat(item["created_at"]).astimezone().date() == today
+           for item in records):
+        return False
+    if phrases & {item["phrase"] for item in records}:
+        raise ValueError("Daily phrases must differ from the existing catalog")
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    additions = []
+    for slot, item in enumerate(proposals):
+        candidates = [old for old in records if old.get("enable") is True
+                      and old.get("event") == "success" and old["topic"] == item["topic"]
+                      and old["project"].get("path") == root]
+        if candidates:
+            oldest = min(candidates, key=lambda old: (datetime.fromisoformat(old["created_at"]), old["id"]))
+            oldest["enable"] = False
+            oldest["updated_at"] = now
+        additions.append({
+            "id": str(uuid.uuid5(uuid.NAMESPACE_URL, f"daily:{root}:{today}:{slot}")),
+            "phrase": item["phrase"], "event": "success", "topic": item["topic"],
+            "enable": True, "created_at": now, "updated_at": now,
+            "project": {"is_project": True, "path": root}, "origin": "daily",
+        })
+    write_catalog(vault, records + additions)
+    return True
 
 
 def enabled_roots(config):
@@ -230,13 +297,21 @@ def merge_phrases(base_path, ours_path, theirs_path):
 
 def main(argv):
     if not argv:
-        raise ValueError("Usage: glados.py refresh|phrase|speak|context|merge-phrases ...")
+        raise ValueError("Usage: glados.py refresh|renew|phrase|speak|context|merge-phrases ...")
     if argv[0] == "merge-phrases" and len(argv) == 4:
         merge_phrases(*argv[1:])
         return
     vault, config = load_config()
     if argv[0] == "refresh" and len(argv) == 1:
         refresh(vault, config)
+    elif argv[0] == "renew" and len(argv) == 1:
+        lock = vault / ".journal.lock"
+        lock.mkdir()
+        try:
+            changed = renew(vault, config, json.load(sys.stdin))
+        finally:
+            lock.rmdir()
+        print("Daily phrases renewed." if changed else "Daily phrases already current.")
     elif argv[0] == "phrase" and len(argv) == 3:
         print(select_phrase(vault, config, argv[1], argv[2]))
     elif argv[0] == "context" and len(argv) == 2:
@@ -250,7 +325,7 @@ def main(argv):
             message = argv[3]
         speak(config, event, message)
     else:
-        raise ValueError("Usage: glados.py refresh|phrase|speak|context|merge-phrases ...")
+        raise ValueError("Usage: glados.py refresh|renew|phrase|speak|context|merge-phrases ...")
 
 
 if __name__ == "__main__":
