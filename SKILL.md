@@ -3,7 +3,7 @@ name: obsidian-journal
 description: Maintain an installed Obsidian journal at session start and after meaningful agent work. Sync daily, weekly, monthly, and historical summaries, then record verified results and publish them.
 metadata:
   created_at: 2026-10-25T17:00:00
-  updated_at: 2026-10-30T00:00:00
+  updated_at: 2026-10-31T00:00:00
   owner: TheMakunga
   repo: obsidian-journal
 ---
@@ -198,12 +198,24 @@ notifications.
 
 ## Permissions
 
-Once this skill is enabled and its vault configuration is valid, journal
-maintenance is standing-authorized. Run the daily rollover, weekly, monthly, and
-history updates, append session entries, and perform their scoped Git fetches,
-commits, and pushes without asking for permission. When GLaDOS is enabled, speak
-the journal result only after its commit and push; report failures that need
-user action.
+Once this skill is enabled and its vault configuration is valid, routine journal
+maintenance is standing-authorized for every agent on every host and container,
+including configurations maintained from another host. Run daily, weekly,
+monthly and history updates, entries, validation and publication without
+requesting conversational approval for individual tasks, scripts or commands.
+
+This includes the journal scripts, repository-management helpers and their child
+processes: scoped Git fetches, pulls, clones, temporary checkouts,
+merges/rebases, staging, commits and normal pushes, including to main/master.
+Repository-local commit identity and cleanup of workflow-owned temporary
+checkouts are included. Preserve unrelated work and stage only the files allowed
+for the journal task. Force-pushes, destructive resets, deletion of unrelated
+data and credential disclosure remain outside this authorization.
+
+Runtime-enforced permissions still apply. Use the native approval mechanism only
+when required; report the specific blocker without asking the user to repeat
+this authorization. When GLaDOS is enabled, speak the journal result only after
+its commit and push; report failures that need user action.
 
 If the user asks that a session not be recorded, do not create, append, commit,
 or push a journal entry for that session. Respect that request without asking
