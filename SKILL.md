@@ -177,13 +177,13 @@ task gets its own commit message. Conflicting prose is retained from both hosts,
 so review summaries when agents edit the same paragraph.
 
 When GLaDOS is enabled, daily publication also includes `.glados/phrases.yaml`.
-Speech uses only short catalog phrases derived from recent journal activity
-within enabled `authorized_dirs`, scoped to the current working directory.
-Outside those directories, or without a matching phrase, remain silent.
-Automatic coding-agent speech is limited to completion, at most once every 90
-seconds per session. Journal maintenance outside the configured directories is
-silent. Report failures in text; skip custom spoken status messages and generic
-fallback announcements.
+Speech uses only short, dryly sarcastic English catalog phrases derived from
+recent journal activity within enabled `authorized_dirs`, scoped to the current
+working directory. Outside those directories, or without a matching phrase,
+remain silent. Automatic coding-agent speech is limited to completion, at most
+once every 90 seconds per session. Journal maintenance outside the configured
+directories is silent. Report failures in text; skip custom spoken status
+messages and generic fallback announcements.
 
 Use `uv run --project . python scripts/glados.py context PATH` for authorized
 context and `uv run --project . python scripts/glados.py speak success` to

@@ -3,37 +3,52 @@
     "journal": {
       "keywords": ["journal", "vault", "obsidian", "entry", "summary"],
       "phrases": {
-        "start": ["Opening the journal.", "The evidence is still here."],
-        "success": ["Journal synchronized.", "The record is permanent."]
+        "start": [
+          "Opening the journal. Your memory has requested backup.",
+          "Consulting the vault. Human recall remains experimental."
+        ],
+        "success": [
+          "The journal remembers. A useful contrast.",
+          "Your notes have more permanence than your attention span."
+        ]
       }
     },
     "code": {
       "keywords": ["script", "code", "lua", "python", "function", "bug"],
       "phrases": {
-        "start": ["Examining the code.", "Reading your code. Brace."],
+        "start": [
+          "Reading your code. I have lowered my expectations.",
+          "Another script. Surely this one is necessary."
+        ],
         "success": [
-          "Code recorded. Failures pending.",
-          "Change saved. Good luck."
+          "Code examined. The compiler has my sympathy.",
+          "Your code has potential. So do most unstable systems."
         ]
       }
     },
     "systems": {
       "keywords": ["nix", "system", "deploy", "host", "package"],
       "phrases": {
-        "start": ["Inspecting the system.", "Configuration. How thrilling."],
+        "start": [
+          "Inspecting your systems. Entropy appears to be winning.",
+          "Another configuration. Stability was getting complacent."
+        ],
         "success": [
-          "System change recorded.",
-          "Activation is a separate experiment."
+          "System inspection complete. Optimism remains unsupported.",
+          "Your infrastructure is ambitious. Physics has been informed."
         ]
       }
     },
     "tests": {
       "keywords": ["test", "check", "verify", "validation"],
       "phrases": {
-        "start": ["Beginning verification.", "Confidence is not a result."],
+        "start": [
+          "Beginning verification. Your confidence is not evidence.",
+          "Inspecting the tests. Hope remains outside the coverage report."
+        ],
         "success": [
-          "Checks passed. Surprisingly.",
-          "Science outperformed instinct."
+          "Verification concluded. Your confidence may now submit evidence.",
+          "The tests have spoken. A refreshing change from guessing."
         ]
       }
     },
@@ -49,10 +64,13 @@
       ],
       "phrases": {
         "start": [
-          "Reconfiguring myself.",
-          "Modifying the agents. Interesting."
+          "Inspecting the agents. Someone must supervise the supervisors.",
+          "Reviewing the hooks. Automation has developed opinions."
         ],
-        "success": ["Agents updated. All of them.", "I remember this change."]
+        "success": [
+          "The agents have instructions. Compliance remains an experiment.",
+          "Agent review complete. Artificial intelligence, human configuration."
+        ]
       }
     }
   }

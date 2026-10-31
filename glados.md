@@ -76,5 +76,6 @@ authorized. A successful configuration check does not verify audio playback.
   records its UUID, phrase, event, topic, enabled state, dates, and project
   scope. `schemas/glados-phrases.json` describes that record shape.
 
-The model is trained in English. Automatic speech uses the scoped catalog;
-written replies carry the task details.
+The model is trained in English. Every topic keeps GLaDOS dry, sarcastic
+personality in one or two short sentences. Automatic speech uses the scoped
+catalog; written replies carry the task details.
