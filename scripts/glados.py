@@ -36,7 +36,7 @@ def phrase_data():
     return json.loads(PHRASE_SOURCE.read_text())
 
 
-def phrase_records(source, topics, existing):
+def phrase_records(source, projects, existing):
     old = {
         item["id"]: item
         for item in existing
@@ -44,28 +44,26 @@ def phrase_records(source, topics, existing):
     }
     records = []
     today = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    for topic, details in [(None, source)] + [
-        (name, source["topics"][name]) for name in topics
-    ]:
+    for root, topic in projects:
+        details = source["topics"][topic]
         groups = details["phrases"]
         for event, phrases in groups.items():
             for phrase in phrases:
                 identifier = str(
-                    uuid.uuid5(uuid.NAMESPACE_URL, f"{topic}:{event}:{phrase}")
+                    uuid.uuid5(uuid.NAMESPACE_URL, f"{root}:{topic}:{event}:{phrase}")
                 )
-                previous = old.get(identifier, {})
+                legacy = str(uuid.uuid5(uuid.NAMESPACE_URL, f"{topic}:{event}:{phrase}"))
+                previous = old.get(identifier, old.get(legacy, {}))
                 records.append(
                     {
                         "id": identifier,
                         "phrase": phrase,
                         "event": event,
-                        "topic": topic or "general",
+                        "topic": topic,
                         "enable": previous.get("enable", True),
                         "created_at": previous.get("created_at", today),
                         "updated_at": previous.get("updated_at", today),
-                        "project": previous.get(
-                            "project", {"is_project": False}
-                        ),
+                        "project": {"is_project": True, "path": str(root)},
                     }
                 )
     return records
@@ -83,19 +81,26 @@ def refresh(vault, config):
             continue
         if today - timedelta(days=7) <= day < today:
             recent.append(path)
-    activity = " ".join(
-        match.group(1)
-        for path in sorted(recent)
-        for match in ENTRY_TEXT.finditer(path.read_text(errors="replace"))
-    ).lower()
+    activity = {root: [] for root in enabled_roots(config)}
+    for path in sorted(recent):
+        for entry in re.split(r"(?m)^### ", path.read_text(errors="replace"))[1:]:
+            fields = " ".join(match.group(1) for match in ENTRY_TEXT.finditer(entry))
+            cwd = re.findall(r"(?m)^\*\*CWD:\*\*\s*`([^`]+)`", entry)
+            files = [match.group(1) for match in ENTRY_TEXT.finditer(entry)
+                     if match.group(0).startswith("**Files:")]
+            paths = [Path(name).resolve() for name in cwd + re.findall(r"`(/[^`\n]+)`", " ".join(files))]
+            for root in activity:
+                if any(within_root(candidate, root) for candidate in paths):
+                    activity[root].append(fields.lower())
     source = phrase_data()
     topics = []
-    for topic, details in source.get("topics", {}).items():
-        if any(
-            re.search(rf"\b{re.escape(word)}\b", activity)
-            for word in details["keywords"]
-        ):
-            topics.append(topic)
+    for root, entries in activity.items():
+        for topic, details in source.get("topics", {}).items():
+            if any(
+                re.search(rf"\b{re.escape(word)}\b", " ".join(entries))
+                for word in details["keywords"]
+            ):
+                topics.append((root, topic))
     destination = vault / ".glados/phrases.yaml"
     existing = yaml.safe_load(destination.read_text()) if destination.exists() else []
     records = phrase_records(source, sorted(topics), existing or [])
@@ -109,8 +114,7 @@ def refresh(vault, config):
     os.replace(name, destination)
 
 
-def allowed_root(config, requested):
-    candidate = Path(requested).resolve(strict=True)
+def enabled_roots(config):
     for item in config.get("authorized_dirs", []):
         if item.get("enable") is not True:
             continue
@@ -118,8 +122,22 @@ def allowed_root(config, requested):
             root = Path(item["path"]).resolve(strict=True)
         except (KeyError, OSError):
             continue
-        if candidate == root or root in candidate.parents:
-            return candidate
+        if root.is_dir():
+            yield root
+
+
+def within_root(candidate, root):
+    # samefile also handles differently cased paths on case-insensitive volumes.
+    return any(
+        parent == root or (parent.exists() and parent.samefile(root))
+        for parent in (candidate, *candidate.parents)
+    )
+
+
+def allowed_root(config, requested):
+    candidate = Path(requested).resolve(strict=True)
+    if any(within_root(candidate, root) for root in enabled_roots(config)):
+        return candidate
     raise ValueError("Path is outside enabled authorized_dirs in .journal.config.toml")
 
 
@@ -142,21 +160,50 @@ def read_context(config, requested):
     sys.stdout.write(content)
 
 
-def speak(config, event, message):
+def select_phrase(vault, config, event, cwd):
     if not config.get("glados", {}).get("enable", False):
-        return
+        return ""
     if event not in EVENTS:
         raise ValueError("Unknown speech event: " + event)
+    try:
+        candidate = allowed_root(config, cwd)
+    except (OSError, ValueError):
+        return ""
+    catalog = vault / ".glados/phrases.yaml"
+    records = yaml.safe_load(catalog.read_text()) if catalog.is_file() else []
+    pool = []
+    for item in records or []:
+        project = item.get("project", {})
+        if item.get("enable") is not True or item.get("event") != event or project.get("is_project") is not True:
+            continue
+        try:
+            root = allowed_root(config, project["path"])
+        except (KeyError, OSError, ValueError):
+            continue
+        phrase = item.get("phrase")
+        if within_root(candidate, root) and isinstance(phrase, str) and 0 < len(phrase) <= 160:
+            pool.append(phrase)
+    if not pool:
+        return ""
+    last_file = Path.home() / ".config/glados-tts" / f"journal-last-{event}.txt"
+    try:
+        last = last_file.read_text()
+    except OSError:
+        last = ""
+    phrase = random.choice([item for item in pool if item != last] or pool)
+    try:
+        last_file.parent.mkdir(parents=True, exist_ok=True)
+        last_file.write_text(phrase)
+    except OSError:
+        pass
+    return phrase
+
+
+def speak(config, event, _message):
+    vault, _ = load_config()
+    message = select_phrase(vault, config, event, Path.cwd())
     if not message:
-        vault, _ = load_config()
-        catalog = vault / ".glados/phrases.yaml"
-        records = yaml.safe_load(catalog.read_text()) if catalog.is_file() else []
-        pool = [
-            item["phrase"] for item in (records or [])
-            if item.get("enable") is True and item.get("event") == event
-        ]
-        message = random.choice(pool) if pool else "Journal task " + event + "."
-    message = " ".join(message.split())[:240]
+        return
     command = config.get("glados", {}).get("command", "glados-say")
     executable = shutil.which(command) if not Path(command).is_absolute() else command
     if not executable:
@@ -183,13 +230,15 @@ def merge_phrases(base_path, ours_path, theirs_path):
 
 def main(argv):
     if not argv:
-        raise ValueError("Usage: glados.py refresh|speak|context|merge-phrases ...")
+        raise ValueError("Usage: glados.py refresh|phrase|speak|context|merge-phrases ...")
     if argv[0] == "merge-phrases" and len(argv) == 4:
         merge_phrases(*argv[1:])
         return
     vault, config = load_config()
     if argv[0] == "refresh" and len(argv) == 1:
         refresh(vault, config)
+    elif argv[0] == "phrase" and len(argv) == 3:
+        print(select_phrase(vault, config, argv[1], argv[2]))
     elif argv[0] == "context" and len(argv) == 2:
         read_context(config, argv[1])
     elif argv[0] == "speak" and len(argv) >= 2:
@@ -201,7 +250,7 @@ def main(argv):
             message = argv[3]
         speak(config, event, message)
     else:
-        raise ValueError("Usage: glados.py refresh|speak|context|merge-phrases ...")
+        raise ValueError("Usage: glados.py refresh|phrase|speak|context|merge-phrases ...")
 
 
 if __name__ == "__main__":

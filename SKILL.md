@@ -177,15 +177,18 @@ task gets its own commit message. Conflicting prose is retained from both hosts,
 so review summaries when agents edit the same paragraph.
 
 When GLaDOS is enabled, daily publication also includes `.glados/phrases.yaml`.
-It announces success only after the commit and push. On failure, it speaks the
-failed operation and prints the error needed to correct it. Agents can use
-`uv run --project . python scripts/glados.py context PATH` to read a file under
-an enabled `authorized_dirs` entry and supply a short, request-specific speech
-message with
-`uv run --project . python scripts/glados.py speak EVENT --message TEXT`. Any
-spoken message about a task must briefly describe the user's actual request or
-its result; generic saved phrases are for confirmations and fallback
-notifications.
+Speech uses only short catalog phrases derived from recent journal activity
+within enabled `authorized_dirs`, scoped to the current working directory.
+Outside those directories, or without a matching phrase, remain silent.
+Automatic coding-agent speech is limited to completion, at most once every 90
+seconds per session. Journal maintenance outside the configured directories is
+silent. Report failures in text; skip custom spoken status messages and generic
+fallback announcements.
+
+Use `uv run --project . python scripts/glados.py context PATH` for authorized
+context and `uv run --project . python scripts/glados.py speak success` to
+select a scoped phrase. The legacy `--message` argument is accepted for existing
+callers, but its text is not spoken.
 
 ## Guardrails
 
@@ -214,8 +217,8 @@ data and credential disclosure remain outside this authorization.
 
 Runtime-enforced permissions still apply. Use the native approval mechanism only
 when required; report the specific blocker without asking the user to repeat
-this authorization. When GLaDOS is enabled, speak the journal result only after
-its commit and push; report failures that need user action.
+this authorization. When GLaDOS is enabled, any scoped journal success phrase
+must follow its commit and push; report failures that need user action in text.
 
 If the user asks that a session not be recorded, do not create, append, commit,
 or push a journal entry for that session. Respect that request without asking

@@ -55,20 +55,26 @@ authorized. A successful configuration check does not verify audio playback.
   `authorized_dirs` entry whose `enable` is `true`. Use
   `uv run --project . python scripts/glados.py context /absolute/path`; file
   reads are limited to text files of 16 KiB or less.
-- Agents supply a short English message related to the user's request with
-  `uv run --project . python scripts/glados.py speak start --message "..."`. The
-  `decision` event has saved confirmation phrases when no custom message is
-  supplied.
-- Journal success speech runs only after the task commit and push succeed.
-  Failures announce the failed operation and instruct the agent to report the
-  error and the corrective step. Speech errors do not undo a successful push.
+- Automatic coding-agent speech runs only at completion, at most once every 90
+  seconds per session, within an enabled `authorized_dirs` directory. Starts,
+  tool calls and approval requests are silent.
+- Speech selects a short English catalog phrase scoped to the working directory
+  with `uv run --project . python scripts/glados.py speak success`. Custom
+  `--message` text is accepted for existing callers but is not spoken. Without
+  an enabled directory or matching phrase, remain silent; there is no generic
+  fallback. `glados.py phrase success /absolute/path` selects text without
+  audio.
+- Journal success speech runs only after the task commit and push succeed and
+  follows the same directory filter. Report failures in text. Speech errors do
+  not undo a successful push.
 - On each daily `sync.lua`, GLaDOS reads Work and Files from the previous seven
-  archived daily entries. It rebuilds `.glados/phrases.yaml` as a YAML list from
-  the phrase bank in `templates/glados-phrases.json`, adding phrases for active
-  topics and dropping phrases for topics that have aged out. The daily publish
+  archived daily entries, using only entries whose CWD or Files point inside an
+  enabled `authorized_dirs` directory. It rebuilds `.glados/phrases.yaml` as a
+  YAML list from `templates/glados-phrases.json`, adding phrases for active
+  directory topics and dropping general or stale phrases. The daily publish
   includes this file automatically when GLaDOS is enabled. Each list item
   records its UUID, phrase, event, topic, enabled state, dates, and project
   scope. `schemas/glados-phrases.json` describes that record shape.
 
-The model is trained in English. Keep spoken messages brief; the agent should
-summarize the actual request or result instead of reading the full response.
+The model is trained in English. Automatic speech uses the scoped catalog;
+written replies carry the task details.
