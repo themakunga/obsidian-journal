@@ -78,10 +78,18 @@
       "type": "object",
       "required": ["enable"],
       "properties": {
-        "enable": { "type": "boolean", "default": false },
-        "command": { "type": "string", "minLength": 1, "default": "glados-say" }
+        "enable": {
+          "type": "boolean",
+          "default": false
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1,
+          "default": "glados-say"
+        }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Legacy inert settings retained for configuration compatibility; GLaDOS owns voice."
     }
   }
 }

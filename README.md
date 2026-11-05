@@ -26,8 +26,8 @@ configuration schema, and development tooling.
 | `scripts/history.lua`       | Update the historical month index                                                         |
 | `scripts/entry.lua`         | Append a validated entry to today's journal                                               |
 | `scripts/publish.lua`       | Publish selected daily, weekly, monthly, history, or entry files with remote race retries |
-| `scripts/glados.py`         | Read authorized context, speak journal status, and refresh phrase catalog                 |
-| `glados.md`                 | Local GLaDOS TTS configuration and behavior                                               |
+| `scripts/glados.py`         | Retired compatibility entrypoint; use the standalone GLaDOS skill                         |
+| `glados.md`                 | Standalone GLaDOS ownership and migration                                                 |
 
 Templates use `{{...}}` placeholders and `{{#each ...}}` blocks. They are source
 templates rather than rendered vault notes. Run the installer as described in
@@ -42,8 +42,9 @@ wiki-links.
 
 The workflow in `SKILL.md` uses Lua for journal operations and Git. The optional
 GLaDOS integration uses Python in its `uv`-managed environment for authorized
-context reads and daily YAML phrase refreshes. Agents write factual summary
-prose after the scripts create the linked structure.
+journal maintenance. Voice and phrase renewal belong to the standalone GLaDOS
+skill. Agents write factual summary prose after the scripts create the linked
+structure.
 
 Run the Lua checks with Lua, Taplo, and Git available on `PATH`:
 

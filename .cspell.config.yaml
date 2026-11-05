@@ -16,6 +16,7 @@ ignorePaths:
   - templates/**
 
 words:
+  - amgmt
   - afplay
   - commitlint
   - DavesArmoury
