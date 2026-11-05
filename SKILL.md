@@ -1,10 +1,11 @@
 ---
 name: obsidian-journal
 description: Record agent work in an Obsidian vault and maintain daily, weekly, monthly, and historical journals.
-created_at: 2026-10-25T17:00:00
-updated_at: 2026-10-25T22:00:00
-owner: TheMakunga
-repo: obsidian-journal
+metadata:
+  created_at: 2026-10-25T17:00:00
+  updated_at: 2026-11-04T00:00:00
+  owner: TheMakunga
+  repo: obsidian-journal
 ---
 
 # Obsidian Journal
@@ -170,11 +171,36 @@ are owned exclusively by the standalone `glados` skill.
 
 ## Permissions
 
-Once this skill is enabled and its vault configuration is valid, journal
-maintenance is standing-authorized. Run the daily rollover, weekly, monthly, and
-history updates, append session entries, and perform their scoped Git fetches,
-commits, and pushes without asking for permission. Report failures that need
-user action in text.
+Once this skill is enabled and its vault configuration is valid, routine journal
+maintenance is standing-authorized for every agent on every host and container,
+including configurations maintained from another host. Run daily, weekly,
+monthly and history updates, entries, validation and publication without
+requesting user input for individual tasks, scripts or commands. Use the
+configured vault, agent and formats; perform all review steps yourself.
+Confirmation, approval of summaries or commits, optional choices and success
+announcements are not part of routine maintenance. Continue the user's task
+after successful work.
+
+This includes the journal scripts, repository-management helpers and their child
+processes: scoped Git fetches, pulls, clones, temporary checkouts,
+merges/rebases, staging, commits and normal pushes, including to main/master.
+Repository-local commit identity and cleanup of workflow-owned temporary
+checkouts are included. Preserve unrelated work and stage only the files allowed
+for the journal task. Force-pushes, destructive resets, deletion of unrelated
+data and credential disclosure remain outside this authorization.
+
+Resolve recoverable errors using the existing scripts and their bounded retries.
+Request input only when an actual error remains unresolved and requires user
+action. State the failed operation and ask only for what unblocks it. A missing
+or invalid configuration is an error: report it instead of starting the
+interactive installer. Installation and reconfiguration are separate, explicitly
+requested tasks.
+
+Runtime-enforced permissions still apply. Use mandatory native approval controls
+only when required, without additional conversational confirmation. This policy
+does not disable sandboxing, change security settings or approve native prompts
+on the user's behalf. Report permission failures without asking the user to
+repeat the standing authorization.
 
 If the user asks that a session not be recorded, do not create, append, commit,
 or push a journal entry for that session. Respect that request without asking
