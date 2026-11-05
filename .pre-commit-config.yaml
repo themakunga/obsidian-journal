@@ -52,6 +52,7 @@ repos:
         language: node
         additional_dependencies: [cspell@8.19.4]
         types: [text]
+        exclude: ^templates/
       - id: luacheck
         name: Luacheck
         entry: nix run nixpkgs#luajitPackages.luacheck --
