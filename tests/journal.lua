@@ -262,9 +262,17 @@ local ok, message = pcall(function()
     assert(io.popen("git -C " .. quote(vault) .. " log -6 --format=%s"))
   local messages = assert(log:read("*a"))
   assert(log:close())
-  for _, task in ipairs({ "daily", "weekly", "monthly", "history", "entry" }) do
-    assert(messages:find("docs%(journal%-" .. task .. "%)"))
+  local count = 0
+  for subject in messages:gmatch("[^\n]+") do
+    assert(
+      subject:match(
+        "^journal: %d%d%d%d%-%d%d%-%d%dT%d%d:%d%d:%d%d[+-]%d%d%d%d %- Test %- .+$"
+      ),
+      subject
+    )
+    count = count + 1
   end
+  assert(count == 6)
   local changed =
     assert(
       io.popen(
