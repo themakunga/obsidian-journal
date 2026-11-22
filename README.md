@@ -1,5 +1,9 @@
 # Obsidian Journal
 
+![Lua](https://img.shields.io/badge/Lua-2C2D72?style=flat-square&logo=lua&logoColor=white)
+![Obsidian](https://img.shields.io/badge/Obsidian-7C3AED?style=flat-square&logo=obsidian&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+
 An agent skill for recording work sessions in an Obsidian vault, with templates
 for daily entries and weekly, monthly, and historical summaries.
 
