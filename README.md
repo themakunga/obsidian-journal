@@ -154,3 +154,17 @@ requirements. Participation is covered by the
 ## License
 
 Licensed under the [MIT License](LICENSE).
+
+## Repository reference
+
+| Path                                 | Purpose                             |
+| ------------------------------------ | ----------------------------------- |
+| [`SKILL.md`](SKILL.md)               | Skill entry point                   |
+| [`scripts/`](scripts/)               | Maintenance and validation commands |
+| [`templates/`](templates/)           | Templates                           |
+| [`tests/`](tests/)                   | Tests and regression checks         |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines             |
+
+The default branch is `develop`. Use the tracked manifests and scripts above
+when preparing changes; keep local credentials and generated files out of
+commits.
