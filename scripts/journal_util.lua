@@ -179,7 +179,12 @@ M.vault = M.vault:gsub("%s+$", "")
 if M.vault:sub(1, 1) ~= "/" then
   M.abort("The installed vault path is not absolute.")
 end
-M.config = M.vault .. (M.vault == "/" and "" or "/") .. ".journal.config.toml"
+M.config = home .. "/.config/obsidian-journal/config.toml"
+if not M.succeeds(
+  "test -e " .. M.quote(M.config) .. " || test -L " .. M.quote(M.config)
+) then
+  M.config = M.vault .. (M.vault == "/" and "" or "/") .. ".journal.config.toml"
+end
 local schema_url = "file://" .. (M.skill .. "/schemas/config.json"):gsub(
   "([^%w%-%._~/])",
   function(char)

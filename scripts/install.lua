@@ -91,7 +91,12 @@ repeat
   io.stderr:write("Enter an existing absolute directory.\n")
 until false
 
-local config = vault .. (vault == "/" and "" or "/") .. ".journal.config.toml"
+local home =
+  assert(os.getenv("HOME"), "HOME is required to locate configuration.")
+local local_config = home .. "/.config/obsidian-journal/config.toml"
+local legacy_config =
+  vault .. (vault == "/" and "" or "/") .. ".journal.config.toml"
+local config = exists(local_config) and local_config or legacy_config
 local schema_url = "file://" .. schema:gsub("([^%w%-%._~/])", function(char)
   return string.format("%%%02X", char:byte())
 end)
@@ -101,6 +106,29 @@ local function valid(path)
       schema_url
     ) .. " - < " .. shell_quote(path) .. " >/dev/null 2>&1"
   )
+end
+
+if not exists(local_config) and exists(legacy_config) and valid(
+  legacy_config
+) then
+  local pipe =
+    io.popen(
+      "taplo get core.path --file-path " .. shell_quote(
+        legacy_config
+      ) .. " -s 2>/dev/null"
+    )
+  local legacy_path = pipe and pipe:read("*a") or ""
+  if pipe then
+    pipe:close()
+  end
+  if legacy_path ~= vault then
+    config = local_config
+    if not succeeds(
+      "mkdir -p " .. shell_quote(home .. "/.config/obsidian-journal")
+    ) then
+      fail("Cannot create the local journal configuration directory.")
+    end
+  end
 end
 
 local had_config = exists(config)
