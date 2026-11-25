@@ -1,5 +1,9 @@
 # Obsidian Journal
 
+![Lua](https://img.shields.io/badge/Lua-2C2D72?style=flat-square&logo=lua&logoColor=white)
+![Obsidian](https://img.shields.io/badge/Obsidian-7C3AED?style=flat-square&logo=obsidian&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+
 An agent skill for recording work sessions in an Obsidian vault, with templates
 for daily entries and weekly, monthly, and historical summaries.
 
@@ -154,3 +158,17 @@ requirements. Participation is covered by the
 ## License
 
 Licensed under the [MIT License](LICENSE).
+
+## Repository reference
+
+| Path                                 | Purpose                             |
+| ------------------------------------ | ----------------------------------- |
+| [`SKILL.md`](SKILL.md)               | Skill entry point                   |
+| [`scripts/`](scripts/)               | Maintenance and validation commands |
+| [`templates/`](templates/)           | Templates                           |
+| [`tests/`](tests/)                   | Tests and regression checks         |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution guidelines             |
+
+The default branch is `develop`. Use the tracked manifests and scripts above
+when preparing changes; keep local credentials and generated files out of
+commits.
