@@ -34,6 +34,17 @@ existing configuration as `.journal.config.toml.invalid-YYYYMMDDHHMMSS` before
 replacing it. A valid configuration for the selected vault is left intact. The
 installer does not configure speech. See [glados.md](glados.md).
 
+## Per-user configuration
+
+`~/.config/obsidian-journal/config.toml` takes precedence over the vault's
+legacy `.journal.config.toml`. Keep `core.path` equal to this user's selected
+absolute vault path. Use this local file when hosts share the same Git
+repository at different home paths; never publish one host's absolute path over
+another's. An invalid local configuration fails validation instead of falling
+back silently. The installer preserves a valid legacy configuration for the
+current host and uses a local configuration when the shared file belongs to
+another host.
+
 ## Directory Layout
 
 ```plain
